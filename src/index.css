@@ -1,0 +1,25 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  background: var(--surface-canvas);
+  color: var(--text-primary);
+  transition:
+    background var(--motion-duration-medium, 0.3s) var(--motion-ease-standard, ease),
+    color var(--motion-duration-medium, 0.3s) var(--motion-ease-standard, ease);
+}
+
+a {
+  color: inherit;
+}

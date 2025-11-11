@@ -1,0 +1,551 @@
+/* ------------------------------------------------------------------
+  UralSteel Web · Design Tokens v1.2
+  Структура слоёв: tokens → base → components → utilities
+-------------------------------------------------------------------*/
+
+@layer tokens, base, components, utilities;
+
+/* =========================
+   @layer tokens (shared)
+   ========================= */
+@layer tokens {
+  :root {
+    /* ---- Brand & Neutral (raw / shared core) */
+    --clr-black:     #000000;
+    --clr-gray-900:  #231f20;
+    --clr-gray-700:  #727272;
+    --clr-gray-300:  #bfbfbf;
+    --clr-white:     #ffffff;
+
+    --clr-brand-400: #f37130;
+    --clr-brand-500: #ff3c00;
+    --clr-brand-600: #f0512c;
+
+    --brand-gradient: linear-gradient(90deg,#ff3c00 0%,#f37130 50%,#f0512c 100%);
+
+    /* ---- Radius */
+    --radius-sm: 6px;   /* input */
+    --radius-md: 12px;  /* card  */
+    --radius-cta: 24px; /* CTA   */
+    /* семантические алиасы */
+    --radius-input: var(--radius-sm);
+    --radius-card:  var(--radius-md);
+
+    /* legacy alias (НЕ использовать в новом коде) */
+    --radius-CTA: var(--radius-cta); /* legacy */
+
+    /* ---- Spacing (4pt grid) */
+    --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+    --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+    /* ---- Motion (semantic) */
+    --motion-duration-fast:   .15s;
+    --motion-duration-medium: .30s;
+    --motion-duration-slow:   .50s;
+    --motion-ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+    --motion-ease-decelerate: cubic-bezier(0.0, 0, 0.2, 1);
+    --motion-ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+    /* legacy (не использовать напрямую) */
+    --duration: var(--motion-duration-medium);
+    --ease:     var(--motion-ease-standard);
+
+    /* ---- Elevation (primary family) */
+    --elev-1l: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --elev-2l: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --elev-1d: 0 2px 4px rgba(0, 0, 0, 0.60);
+    --elev-2d: 0 4px 12px rgba(0, 0, 0, 0.48);
+    --elev-3d: 0 8px 24px rgba(0, 0, 0, 0.64);
+
+    /* legacy alias families */
+    --elevation-1: var(--elev-1d);  /* legacy */
+    --elevation-2: var(--elev-2d);  /* legacy */
+    --elevation-3: var(--elev-3d);  /* legacy */
+
+    /* semantic shadows (map in themes) */
+    --shadow-1: var(--elev-1l);
+    --shadow-2: var(--elev-2l);
+    --shadow-3: 0 8px 24px rgba(0,0,0,.10);
+
+    /* ---- Charts defaults (overridden in themes) */
+    --chart-grid: rgba(0,0,0,.08);
+    --chart-grid-strong: rgba(0,0,0,.16);
+    --chart-axis: var(--clr-gray-700);
+    --chart-line-1: var(--clr-brand-500);
+    --chart-line-2: var(--clr-brand-400);
+    --chart-line-3: #4f46e5; /* indigo-600 */
+    --chart-line-4: #06b6d4; /* cyan-500   */
+    --chart-line-5: #10b981; /* emerald-500*/
+    --chart-line-6: #f59e0b; /* amber-500  */
+    --chart-line-7: #ef4444; /* red-500    */
+    --chart-line-8: #a855f7; /* violet-500 */
+    --chart-area-1: rgba(255, 60, 0, .18);
+    --chart-area-2: rgba(243, 113, 48, .18);
+    --chart-area-3: rgba(79, 70, 229, .18);
+    --chart-area-4: rgba(6, 182, 212, .18);
+    --chart-area-5: rgba(16, 185, 129, .18);
+    --chart-area-6: rgba(245, 158, 11, .18);
+    --chart-area-7: rgba(239, 68, 68, .18);
+    --chart-area-8: rgba(168, 85, 247, .18);
+
+    /* ---- Typography */
+    --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+
+    /* ---- Breakpoints */
+    --bp-sm: 640px;
+    --bp-md: 768px;
+    --bp-lg: 1024px;
+    --bp-xl: 1280px;
+
+    /* ---- Z-index */
+    --z-dropdown:  1000;
+    --z-sticky:    1020;
+    --z-fixed:     1030;
+    --z-modal:     1050;
+    --z-popover:   1060;
+    --z-tooltip:   1070;
+  }
+}
+
+/* =========================
+   Themes
+   ========================= */
+@layer tokens {
+  /* ---------- Light ---------- */
+  html[data-theme="light"] {
+    color-scheme: light;
+
+    /* Surfaces & Borders */
+    --surface-canvas:   #ffffff;
+    --surface-subtle:   #f9f9f9;  /* ≈ gray-300@10% */
+    --surface-elevated: #ffffff;
+    --surface-accent:   #fff4ee;  /* мягкий акцентовый фон */
+    --surface-active:   #fff0e8;  /* активные/нажатие */
+
+    --border-default:   #bfbfbf;
+    --border-hover:     #9f9f9f;
+    --border-strong:    #8a8a8a;
+
+    /* Text */
+    --text-primary:     #231f20;
+    --text-secondary:   #727272;
+    --text-inverse:     #ffffff;
+
+    /* Brand (semantic) */
+    --brand-primary:    #ff3c00;
+    --brand-hover:      #f37130;
+    --brand-active:     #f0512c;
+
+    /* Input */
+    --input-bg:            #ffffff;
+    --input-placeholder:   #9a9a9a;
+
+    /* Focus (тоньше и мягче) */
+    --focus-ring: 0 0 0 2px rgba(255,60,0,.28);
+
+    /* Charts */
+    --chart-grid:         rgba(0,0,0,.08);
+    --chart-grid-strong:  rgba(0,0,0,.16);
+    --chart-axis:         var(--text-secondary);
+
+    /* Shadows (semantic mapping) */
+    --shadow-1: var(--elev-1l);
+    --shadow-2: var(--elev-2l);
+    --shadow-card: 0 2px 4px rgba(0,0,0,.08);
+
+    /* Hover subtle fallback (works everywhere) */
+    --hover-subtle: rgba(255,60,0,.12);
+
+    /* Legacy aliases (do not use in new code) */
+    --text:          var(--text-primary);
+    --text-muted:    var(--text-secondary);
+    --accent:        var(--brand-primary);
+    --error:         #dc2626;
+    --active-strong: var(--brand-active);
+    --loader-track-bg: #efefef; /* чтобы совпадать с кодом */
+  }
+
+  /* Modern hover-subtle with color-mix (only if supported) */
+  @supports (background-color: color-mix(in oklab, #000 0%, transparent)) {
+    html[data-theme="light"] {
+      --hover-subtle: color-mix(in oklab, #ff3c00 12%, transparent);
+    }
+  }
+
+  /* ---------- Dark ---------- */
+  html[data-theme="dark"] {
+    color-scheme: dark;
+
+    /* Surfaces & Borders */
+    --surface-canvas:   #121212;
+    --surface-subtle:   #1e1e1f;
+    --surface-elevated: #1f1f1f;
+    --surface-accent:   #1c1411;
+    --surface-active:   #241a16;
+
+    --border-default:   #2e2e2f;
+    --border-hover:     #3a3a3b;
+    --border-strong:    #4a4a4b;
+
+    /* Text */
+    --text-primary:     #f5f5f5;
+    --text-secondary:   #bfbfbf;
+    --text-inverse:     #000000;
+
+    /* Brand (semantic) */
+    --brand-primary:    #ff3c00;
+    --brand-hover:      #f37130;
+    --brand-active:     #f0512c;
+
+    /* Input */
+    --input-bg:            #1e1e1f;
+    --input-placeholder:   #8a8a8a;
+
+    /* Focus (тоньше и мягче) */
+    --focus-ring: 0 0 0 2px rgba(255,60,0,.45);
+
+    /* Charts */
+    --chart-grid:         rgba(255,255,255,.12);
+    --chart-grid-strong:  rgba(255,255,255,.20);
+    --chart-axis:         var(--text-secondary);
+
+    /* Shadows (semantic mapping) */
+    --shadow-1: var(--elev-1d);
+    --shadow-2: var(--elev-2d);
+    --shadow-card: 0 2px 4px rgba(0,0,0,.60);
+
+    /* Hover subtle fallback */
+    --hover-subtle: rgba(255,60,0,.18);
+
+    /* Legacy aliases */
+    --text:          var(--text-primary);
+    --text-muted:    var(--text-secondary);
+    --accent:        var(--brand-primary);
+    --error:         #ef4444;
+    --active-strong: var(--brand-active);
+    --loader-track-bg: #2a2a2b;
+  }
+
+  @supports (background-color: color-mix(in oklab, #000 0%, transparent)) {
+    html[data-theme="dark"] {
+      --hover-subtle: color-mix(in oklab, #ff3c00 18%, transparent);
+    }
+  }
+
+  /* ---- Semantic statuses (shared color slots) */
+  :root {
+    --sem-success-bg-light:  #009e60;
+    --sem-success-bg-dark:   #008652;
+    --sem-warning-bg-light:  #f8b000;
+    --sem-warning-bg-dark:   #e09b00;
+    --sem-error-bg-light:    #e02424;
+    --sem-error-bg-dark:     #c91f1f;
+  }
+
+  html[data-theme="light"] {
+    --sem-success-bg: var(--sem-success-bg-light);
+    --sem-warning-bg: var(--sem-warning-bg-light);
+    --sem-error-bg:   var(--sem-error-bg-light);
+    --sem-on:         #ffffff;
+    --sem-on-strong:  #000000; /* для warning на светлом */
+  }
+
+  html[data-theme="dark"] {
+    --sem-success-bg: var(--sem-success-bg-dark);
+    --sem-warning-bg: var(--sem-warning-bg-dark);
+    --sem-error-bg:   var(--sem-error-bg-dark);
+    --sem-on:         #ffffff;
+    --sem-on-strong:  #000000;
+  }
+}
+
+/* =========================
+   @layer base
+   ========================= */
+@layer base {
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--surface-canvas);
+    color: var(--text-primary);
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Ensure form controls inherit project font */
+  :where(button, input, select, textarea, optgroup) { font: inherit; color: inherit; }
+  ::placeholder { color: var(--input-placeholder); }
+
+  /* Сфокусированный доступ: только интерактивные элементы */
+  :where(button, [role="button"], a[href], input, textarea, select):focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: calc(var(--motion-duration-medium) * 0.5);
+      transition-duration: calc(var(--motion-duration-medium) * 0.5);
+    }
+  }
+}
+
+/* =========================
+   @layer components (examples)
+   ========================= */
+@layer components {
+  .btn-primary {
+    background: var(--brand-primary);
+    color: var(--text-inverse);
+    border-radius: var(--radius-cta);
+    padding: 12px 24px;
+    transition: background var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  .btn-primary:hover { background: var(--brand-hover); }
+  .btn-primary:active { background: var(--brand-active); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--brand-primary);
+    border: 1px solid currentColor;
+    border-radius: var(--radius-cta);
+    padding: 12px 24px;
+    transition: background var(--motion-duration-fast) var(--motion-ease-standard), color var(--motion-duration-fast);
+  }
+  .btn-secondary:hover  { background: var(--hover-subtle); color: var(--brand-active); }
+  .btn-secondary:active { color: var(--brand-active); }
+
+  .card {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .input {
+    background: var(--input-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-input);
+    font: inherit;
+    padding: 10px 12px;
+    transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  .input::placeholder { color: var(--input-placeholder); }
+  .input:hover  { border-color: var(--border-hover); }
+  .input:focus  { border-color: var(--brand-primary); }
+}
+
+/* =========================
+   @layer utilities (helpers)
+   ========================= */
+@layer utilities {
+  .elev-1 { box-shadow: var(--shadow-1); }
+  .elev-2 { box-shadow: var(--shadow-2); }
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+}
+
+/* =========================
+   Chart integration (JS hint)
+   ========================= */
+/* Пример: const css = getComputedStyle(document.documentElement);
+   const axis = css.getPropertyValue('--chart-axis').trim(); */
+
+/* =========================
+   Типографика (рекомендации)
+   ========================= */
+/*
+Display/H1 — Inter Bold 48/56
+H2 — Inter Bold 32/40
+Body 1 — Inter Regular 16/24
+Body 2 — Inter Regular 14/20
+Применение: body { font-family: var(--font-sans); }
+*/
+
+/* =========================
+   Доступность (сводка)
+   ========================= */
+/*
+Контраст primary-кнопки (#ff3c00 на #ffffff) ≥ 4.0:1 — ок для крупного текста и кнопок.
+Не использовать бренд-оранжевый для мелкого текста на белом фоне (не пройдёт 4.5:1).
+Фокус-кольцо — токен --focus-ring, применяется к интерактивным элементам.
+Поддержан prefers-reduced-motion.
+*/
+
+/* =========================
+   Темизация в коде
+   ========================= */
+/*
+document.documentElement.setAttribute('data-theme', theme)
+// где theme: 'light' | 'dark'
+*/
+
+/* =========================
+   Графики — правила
+   ========================= */
+/*
+Ось: используйте --chart-axis (семантически = --text-secondary).
+Сетка: --chart-grid и --chart-grid-strong.
+Серии 1..8: --chart-line-*, для area — соответствующие --chart-area-*.
+Чтение: getComputedStyle(document.documentElement).
+*/
+
+/* =========================
+   Обратная совместимость (алиасы)
+   ========================= */
+/*
+Оставлены только как legacy (не использовать в новом коде):
+--text → --text-primary
+--text-muted → --text-secondary
+--accent → --brand-primary
+--active-strong → --brand-active
+--radius-CTA → --radius-cta
+--elevation-* → маппинг на --elev-*
+--border → удалён, заменять на --border-default
+добавлен --loader-track-bg (оба theme).
+*/
+
+/* =========================
+   План миграции (без ломающих)
+   ========================= */
+/*
+Hover fallback: применить @supports color-mix (уже в файле).
+Тени: оставить --elev-*; --elevation-* как legacy; использовать --shadow-* семантически.
+Бордеры: заменить все использования --border → --border-default.
+Радиусы: --radius-CTA → --radius-cta (алиас остаётся до удаления).
+Motion: использовать только --motion-duration-* и --motion-ease-*.
+Типографика: в body использовать --font-sans.
+Тема в HTML: html[data-theme="…"]; добавить color-scheme (сделано).
+Документация Storybook: 2 темы, визуальные регрессии; подключить @layer порядок.
+Компоненты: заменить хардкоды на семантические токены (--brand-*, --text-*, --border-*, --surface-*, --input-*).
+Графики: перейти на --chart-* (1..8), применить --chart-grid-strong.
+*/
+
+/* =========================
+   Активация новой стилизации (unlayered override)
+   Добавляет высокий приоритет за счёт специфичности селектора.
+   Включается атрибутом: html[data-ds-version="v1.2"]
+   ========================= */
+html[data-ds-version="v1.2"][data-theme="light"] {
+  /* Surfaces & Borders */
+  --surface-canvas:   #ffffff;
+  --surface-subtle:   #f9f9f9;
+  --surface-elevated: #ffffff;
+  --surface-accent:   #fff4ee;
+  --surface-active:   #fff0e8;
+
+  --border-default:   #bfbfbf;
+  --border-hover:     #9f9f9f;
+  --border-strong:    #8a8a8a;
+
+  /* Text */
+  --text-primary:     #231f20;
+  --text-secondary:   #727272;
+  --text-inverse:     #ffffff;
+
+  /* Brand */
+  --brand-primary:    #ff3c00;
+  --brand-hover:      #f37130;
+  --brand-active:     #f0512c;
+
+  /* Input */
+  --input-bg:            #ffffff;
+  --input-placeholder:   #9a9a9a;
+
+  /* Focus */
+  --focus-ring: 0 0 0 3px rgba(255,60,0,.40);
+
+  /* Charts */
+  --chart-grid:         rgba(0,0,0,.08);
+  --chart-grid-strong:  rgba(0,0,0,.16);
+  --chart-axis:         var(--text-secondary);
+
+  /* Shadows */
+  --shadow-1: var(--elev-1l);
+  --shadow-2: var(--elev-2l);
+  --shadow-card: 0 2px 4px rgba(0,0,0,.08);
+
+  /* Hover subtle fallback */
+  --hover-subtle: rgba(255,60,0,.12);
+
+  /* Legacy aliases */
+  --text:          var(--text-primary);
+  --text-muted:    var(--text-secondary);
+  --accent:        var(--brand-primary);
+  --error:         #dc2626;
+  --active-strong: var(--brand-active);
+  --loader-track-bg: #efefef;
+
+  /* Semantic statuses mapping */
+  --sem-success-bg: var(--sem-success-bg-light);
+  --sem-warning-bg: var(--sem-warning-bg-light);
+  --sem-error-bg:   var(--sem-error-bg-light);
+  --sem-on:         #ffffff;
+  --sem-on-strong:  #000000;
+}
+
+html[data-ds-version="v1.2"][data-theme="dark"] {
+  /* Surfaces & Borders */
+  --surface-canvas:   #121212;
+  --surface-subtle:   #1e1e1f;
+  --surface-elevated: #1f1f1f;
+  --surface-accent:   #1c1411;
+  --surface-active:   #241a16;
+
+  --border-default:   #2e2e2f;
+  --border-hover:     #3a3a3b;
+  --border-strong:    #4a4a4b;
+
+  /* Text */
+  --text-primary:     #f5f5f5;
+  --text-secondary:   #bfbfbf;
+  --text-inverse:     #000000;
+
+  /* Brand */
+  --brand-primary:    #ff3c00;
+  --brand-hover:      #f37130;
+  --brand-active:     #f0512c;
+
+  /* Input */
+  --input-bg:            #1e1e1f;
+  --input-placeholder:   #8a8a8a;
+
+  /* Focus */
+  --focus-ring: 0 0 0 3px rgba(255,60,0,.60);
+
+  /* Charts */
+  --chart-grid:         rgba(255,255,255,.12);
+  --chart-grid-strong:  rgba(255,255,255,.20);
+  --chart-axis:         var(--text-secondary);
+
+  /* Shadows */
+  --shadow-1: var(--elev-1d);
+  --shadow-2: var(--elev-2d);
+  --shadow-card: 0 2px 4px rgba(0,0,0,.60);
+
+  /* Hover subtle fallback */
+  --hover-subtle: rgba(255,60,0,.18);
+
+  /* Legacy aliases */
+  --text:          var(--text-primary);
+  --text-muted:    var(--text-secondary);
+  --accent:        var(--brand-primary);
+  --error:         #ef4444;
+  --active-strong: var(--brand-active);
+  --loader-track-bg: #2a2a2b;
+
+  /* Semantic statuses mapping */
+  --sem-success-bg: var(--sem-success-bg-dark);
+  --sem-warning-bg: var(--sem-warning-bg-dark);
+  --sem-error-bg:   var(--sem-error-bg-dark);
+  --sem-on:         #ffffff;
+  --sem-on-strong:  #000000;
+}
+
+@supports (background-color: color-mix(in oklab, #000 0%, transparent)) {
+  html[data-ds-version="v1.2"][data-theme="light"] {
+    --hover-subtle: color-mix(in oklab, #ff3c00 12%, transparent);
+  }
+  html[data-ds-version="v1.2"][data-theme="dark"] {
+    --hover-subtle: color-mix(in oklab, #ff3c00 18%, transparent);
+  }
+}
