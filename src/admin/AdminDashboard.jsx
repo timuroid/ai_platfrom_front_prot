@@ -491,35 +491,48 @@ export default function AdminDashboard() {
     </header>
   )
 
-  const renderDashboardFilters = () => (
-    <div className="filters-grid management-filters dashboard-filters">
-      <div className="field field-date-range">
-        <span>Период</span>
-        <div className="date-range-inputs">
-          <input
-            type="date"
-            value={dashboardFilters.from}
-            onChange={(event) => updateFilter('dashboards', 'from', event.target.value)}
-            placeholder="От"
-          />
-          <span className="date-range-separator">—</span>
-          <input
-            type="date"
-            value={dashboardFilters.to}
-            onChange={(event) => updateFilter('dashboards', 'to', event.target.value)}
-            placeholder="До"
-          />
+  const renderDashboardFilters = () => {
+    const formatDateRange = () => {
+      if (!dashboardFilters.from && !dashboardFilters.to) return 'Выберите период'
+      if (dashboardFilters.from && dashboardFilters.to) {
+        return `${new Date(dashboardFilters.from).toLocaleDateString('ru-RU')} — ${new Date(dashboardFilters.to).toLocaleDateString('ru-RU')}`
+      }
+      if (dashboardFilters.from) return `С ${new Date(dashboardFilters.from).toLocaleDateString('ru-RU')}`
+      return `До ${new Date(dashboardFilters.to).toLocaleDateString('ru-RU')}`
+    }
+
+    return (
+      <div className="filters-grid management-filters dashboard-filters">
+        <div className="field">
+          <span>Период</span>
+          <div className="date-range-picker">
+            <span className="date-range-display">{formatDateRange()}</span>
+            <input
+              type="date"
+              className="date-range-input"
+              value={dashboardFilters.from}
+              onChange={(event) => updateFilter('dashboards', 'from', event.target.value)}
+              placeholder="От"
+            />
+            <input
+              type="date"
+              className="date-range-input"
+              value={dashboardFilters.to}
+              onChange={(event) => updateFilter('dashboards', 'to', event.target.value)}
+              placeholder="До"
+            />
+          </div>
         </div>
+        {renderSelectDropdown({
+          sectionId: 'dashboards',
+          filter: { id: 'model', label: 'Модель', options: MODEL_OPTIONS },
+          value: dashboardFilters.model,
+          onChange: (nextValue) => updateFilter('dashboards', 'model', nextValue),
+          scope: 'dashboard'
+        })}
       </div>
-      {renderSelectDropdown({
-        sectionId: 'dashboards',
-        filter: { id: 'model', label: 'Модель', options: MODEL_OPTIONS },
-        value: dashboardFilters.model,
-        onChange: (nextValue) => updateFilter('dashboards', 'model', nextValue),
-        scope: 'dashboard'
-      })}
-    </div>
-  )
+    )
+  }
 
   const renderDashboardAnalytics = () => {
     if (!currentDashboardMode) return null
