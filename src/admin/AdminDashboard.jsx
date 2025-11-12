@@ -1,8 +1,22 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ChevronDown
+  ChevronDown,
+  Users,
+  MessageSquare,
+  FileUp,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Zap,
+  Target,
+  Activity,
+  FileText,
+  Image,
+  Search,
+  Clock
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar.jsx'
+import EmptyState from './components/EmptyState.jsx'
 import './Admin.css'
 
 const MODEL_OPTIONS = [
@@ -24,10 +38,10 @@ const DASHBOARD_MODES = {
       { id: 'messages', label: 'Сообщения' }
     ],
     kpis: [
-      { id: 'dau', label: 'DAU' },
-      { id: 'newUsers', label: 'Новые пользователи' },
-      { id: 'newDialogs', label: 'Новые диалоги' },
-      { id: 'stickiness', label: 'Приверженность' }
+      { id: 'dau', label: 'DAU', icon: Users, trend: 'up', trendValue: '+12%' },
+      { id: 'newUsers', label: 'Новые пользователи', icon: TrendingUp, trend: 'up', trendValue: '+8%' },
+      { id: 'newDialogs', label: 'Новые диалоги', icon: MessageSquare, trend: 'up', trendValue: '+15%' },
+      { id: 'stickiness', label: 'Приверженность', icon: Target, trend: 'neutral', trendValue: '45%' }
     ],
     detailColumns: ['Дата', 'DAU', 'Новые пользователи', 'Новые диалоги', 'Сообщения']
   },
@@ -44,10 +58,10 @@ const DASHBOARD_MODES = {
       { id: 'other', label: 'Другие' }
     ],
     kpis: [
-      { id: 'uploads', label: 'Загрузки/день' },
-      { id: 'usersWithFiles', label: '% пользователей' },
-      { id: 'dlpReject', label: 'DLP %' },
-      { id: 'avgSize', label: 'Средний размер' }
+      { id: 'uploads', label: 'Загрузки/день', icon: FileUp, trend: 'up', trendValue: '+23%' },
+      { id: 'usersWithFiles', label: '% пользователей', icon: Users, trend: 'up', trendValue: '67%' },
+      { id: 'dlpReject', label: 'DLP %', icon: Activity, trend: 'down', trendValue: '2.1%' },
+      { id: 'avgSize', label: 'Средний размер', icon: FileText, trend: 'neutral', trendValue: '1.2 MB' }
     ],
     detailColumns: ['Тип', 'Загрузки', 'Пользователи', 'Средний размер', 'Reject %']
   },
@@ -61,10 +75,10 @@ const DASHBOARD_MODES = {
       { id: 'other', label: 'Прочие' }
     ],
     kpis: [
-      { id: 'sessions', label: '% сессий' },
-      { id: 'invocations', label: 'Вызовов/польз.' },
-      { id: 'searchPerDay', label: 'Поиск/день' },
-      { id: 'imagePerDay', label: 'Изображения/день' }
+      { id: 'sessions', label: '% сессий', icon: Target, trend: 'up', trendValue: '34%' },
+      { id: 'invocations', label: 'Вызовов/польз.', icon: Zap, trend: 'up', trendValue: '5.2' },
+      { id: 'searchPerDay', label: 'Поиск/день', icon: Search, trend: 'up', trendValue: '1.2K' },
+      { id: 'imagePerDay', label: 'Изображения/день', icon: Image, trend: 'up', trendValue: '340' }
     ],
     detailColumns: ['Инструмент', 'adoption %', 'Вызовы', '/active', '$/invoke', 'Ошибка %']
   },
@@ -78,10 +92,10 @@ const DASHBOARD_MODES = {
       { id: 'tokensOut', label: 'Tokens out' }
     ],
     kpis: [
-      { id: 'totalCost', label: 'Общая стоимость' },
-      { id: 'costPerActive', label: 'Стоимость/активный' },
-      { id: 'tokensIn', label: 'Tokens in' },
-      { id: 'tokensOut', label: 'Tokens out' }
+      { id: 'totalCost', label: 'Общая стоимость', icon: DollarSign, trend: 'up', trendValue: '$2.4K' },
+      { id: 'costPerActive', label: 'Стоимость/активный', icon: Users, trend: 'down', trendValue: '$0.85' },
+      { id: 'tokensIn', label: 'Tokens in', icon: TrendingUp, trend: 'up', trendValue: '12.5M' },
+      { id: 'tokensOut', label: 'Tokens out', icon: TrendingDown, trend: 'up', trendValue: '8.2M' }
     ],
     detailColumns: ['Модель', 'Requests', 'Tokens in', 'Tokens out', 'Cost total', 'Cost/session', 'Доля %']
   },
@@ -98,10 +112,10 @@ const DASHBOARD_MODES = {
       { id: 'guardrail', label: 'Guardrail/DLP' }
     ],
     kpis: [
-      { id: 'ttftP50', label: 'TTFT P50/P95' },
-      { id: 'ttltP50', label: 'TTLT P50/P95' },
-      { id: 'tokensSpeed', label: 'Tokens/sec' },
-      { id: 'errorRate', label: 'Error rate' }
+      { id: 'ttftP50', label: 'TTFT P50/P95', icon: Clock, trend: 'down', trendValue: '420ms' },
+      { id: 'ttltP50', label: 'TTLT P50/P95', icon: Clock, trend: 'down', trendValue: '2.1s' },
+      { id: 'tokensSpeed', label: 'Tokens/sec', icon: Zap, trend: 'up', trendValue: '45' },
+      { id: 'errorRate', label: 'Error rate', icon: Activity, trend: 'down', trendValue: '0.8%' }
     ],
     detailColumns: ['Модель/канал', 'TTFT', 'TTLT', 'Tokens/sec', 'Error %', 'Timeout %', 'Guardrail %']
   },
@@ -115,10 +129,10 @@ const DASHBOARD_MODES = {
       { id: 'd30', label: 'D30' }
     ],
     kpis: [
-      { id: 'd1', label: 'D1' },
-      { id: 'd7', label: 'D7' },
-      { id: 'd30', label: 'D30' },
-      { id: 'mPlus1', label: 'M+1' }
+      { id: 'd1', label: 'D1', icon: Target, trend: 'neutral', trendValue: '78%' },
+      { id: 'd7', label: 'D7', icon: TrendingUp, trend: 'up', trendValue: '52%' },
+      { id: 'd30', label: 'D30', icon: Users, trend: 'up', trendValue: '34%' },
+      { id: 'mPlus1', label: 'M+1', icon: Activity, trend: 'neutral', trendValue: '28%' }
     ],
     detailColumns: ['Месяц активации', 'M+1', 'M+2', 'M+3', 'Комментарий']
   }
@@ -307,6 +321,7 @@ export default function AdminDashboard() {
   const [seriesState, setSeriesState] = useState({})
   const [navOpen, setNavOpen] = useState(true)
   const [openDropdown, setOpenDropdown] = useState(null)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const dropdownRefs = useRef({})
 
   const dashboardFilters = filters.dashboards || DEFAULT_FILTERS.dashboards
@@ -499,7 +514,12 @@ export default function AdminDashboard() {
               </thead>
               <tbody>
                 <tr>
-                  <td colSpan={columns.length}>Нет данных — подключите источник.</td>
+                  <td colSpan={columns.length} style={{ padding: 0, border: 'none' }}>
+                    <EmptyState
+                      title="Нет данных"
+                      description="Подключите источник данных для отображения детальной информации"
+                    />
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -513,12 +533,30 @@ export default function AdminDashboard() {
     if (!currentDashboardMode) return null
     return (
       <section className="kpi-grid">
-        {currentDashboardMode.kpis.map((kpi) => (
-          <div className="kpi-card" key={kpi.id}>
-            <span className="kpi-label">{kpi.label}</span>
-            <span className="kpi-value">—</span>
-          </div>
-        ))}
+        {currentDashboardMode.kpis.map((kpi) => {
+          const Icon = kpi.icon
+          const trendClass = `kpi-trend kpi-trend-${kpi.trend}`
+          const TrendIcon = kpi.trend === 'up' ? TrendingUp : kpi.trend === 'down' ? TrendingDown : null
+
+          return (
+            <div className="kpi-card" key={kpi.id}>
+              <div className="kpi-header">
+                <div className="kpi-icon-wrapper">
+                  {Icon && <Icon size={20} strokeWidth={2} />}
+                </div>
+                <span className="kpi-label">{kpi.label}</span>
+              </div>
+              <div className="kpi-body">
+                <span className="kpi-value">{kpi.trendValue || '—'}</span>
+                {TrendIcon && (
+                  <span className={trendClass}>
+                    <TrendIcon size={16} strokeWidth={2.5} />
+                  </span>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </section>
     )
   }
@@ -615,13 +653,36 @@ export default function AdminDashboard() {
 
   const renderManagementView = () => {
     if (!currentManagement) return null
+
+    // Подсчет активных фильтров
+    const activeFiltersCount = currentManagement.filters.reduce((count, filter) => {
+      const value = filters[section]?.[filter.id]
+      if (!value) return count
+      if (Array.isArray(value) && value.length > 0) return count + 1
+      if (typeof value === 'string' && value !== '' && value !== 'all') return count + 1
+      return count
+    }, 0)
+
     return (
       <>
         <header className="page-toolbar">
           <h1 className="page-heading">{currentManagement.title}</h1>
         </header>
         <div className="admin-content">
-          <div className="filters-grid management-filters">
+          <button
+            type="button"
+            className={`filters-toggle ${filtersOpen ? 'is-open' : ''}`}
+            onClick={() => setFiltersOpen(!filtersOpen)}
+          >
+            <span>
+              Фильтры
+              {activeFiltersCount > 0 && (
+                <span className="filters-toggle-badge">{activeFiltersCount}</span>
+              )}
+            </span>
+            <ChevronDown size={20} />
+          </button>
+          <div className={`filters-grid management-filters is-collapsible ${filtersOpen ? 'is-open' : ''}`}>
             {currentManagement.filters.map((filter) => renderFilterControl(section, filter))}
           </div>
           <section className="card table-card">
@@ -640,7 +701,12 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     <tr>
-                      <td colSpan={currentManagement.columns.length}>Нет данных — подключите источник.</td>
+                      <td colSpan={currentManagement.columns.length} style={{ padding: 0, border: 'none' }}>
+                        <EmptyState
+                          title="Нет данных"
+                          description="Подключите источник данных для отображения информации"
+                        />
+                      </td>
                     </tr>
                   </tbody>
                 </table>

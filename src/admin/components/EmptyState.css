@@ -1,0 +1,121 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10) var(--space-6);
+  min-height: 280px;
+  text-align: center;
+  gap: var(--space-5);
+  animation: fadeIn 0.4s var(--motion-ease-decelerate);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.empty-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand-primary) 8%, transparent),
+    color-mix(in srgb, var(--brand-hover) 12%, transparent)
+  );
+  color: var(--brand-primary);
+  margin-bottom: var(--space-2);
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+
+.empty-state-content {
+  max-width: 420px;
+}
+
+.empty-state-title {
+  margin: 0 0 var(--space-2);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.empty-state-description {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.empty-state-action {
+  margin-top: var(--space-2);
+  padding: 12px 28px;
+  border: none;
+  border-radius: var(--radius-cta);
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.empty-state-action:hover {
+  background: var(--brand-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 30%, transparent);
+}
+
+.empty-state-action:active {
+  background: var(--brand-active);
+  transform: translateY(0);
+}
+
+@media (max-width: 720px) {
+  .empty-state {
+    padding: var(--space-8) var(--space-4);
+    min-height: 240px;
+  }
+
+  .empty-state-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .empty-state-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .empty-state-title {
+    font-size: 1.1rem;
+  }
+
+  .empty-state-description {
+    font-size: 0.9rem;
+  }
+}
