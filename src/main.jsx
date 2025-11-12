@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import AdminDashboard from './admin/AdminDashboard.jsx'
+import AllChats from './AllChats.jsx'
 
 function Root() {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
@@ -21,6 +22,10 @@ function Root() {
 
   if (route === '/admin') {
     return <AdminDashboard />
+  }
+
+  if (route === '/chats') {
+    return <AllChats />
   }
 
   return <App />
