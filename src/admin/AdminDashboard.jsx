@@ -70,7 +70,7 @@ const DASHBOARD_MODES = {
   },
   cost: {
     id: 'cost',
-        title: '???????',
+    title: 'Стоимость',
     defaultSeries: ['cost', 'tokensIn', 'tokensOut'],
     series: [
       { id: 'cost', label: 'Стоимость' },
@@ -87,7 +87,7 @@ const DASHBOARD_MODES = {
   },
   quality: {
     id: 'quality',
-        title: '??????????',
+    title: 'Качество',
     defaultSeries: ['ttft', 'ttlt', 'errors'],
     series: [
       { id: 'ttft', label: 'TTFT' },
@@ -107,7 +107,7 @@ const DASHBOARD_MODES = {
   },
   cohorts: {
     id: 'cohorts',
-        title: '?????????',
+    title: 'Когорты',
     defaultSeries: ['d1', 'd7', 'd30'],
     series: [
       { id: 'd1', label: 'D1' },
