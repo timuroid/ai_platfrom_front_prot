@@ -354,6 +354,7 @@ export default function AdminDashboard() {
   const [showBulkActions, setShowBulkActions] = useState(false)
   const [modalState, setModalState] = useState({ isOpen: false, type: null })
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, data: null })
+  const [hoveredDataIndex, setHoveredDataIndex] = useState(null)
   const dropdownRefs = useRef({})
   const chartKey = useRef(0)
 
@@ -875,12 +876,6 @@ export default function AdminDashboard() {
               </div>
               <div className="kpi-body">
                 <span className="kpi-value">{metricData.value || '—'}</span>
-                {TrendIcon && (
-                  <span className={trendClass}>
-                    <TrendIcon size={16} strokeWidth={2.5} />
-                    <span style={{ fontSize: '0.75rem', marginLeft: '4px' }}>{metricData.trendValue}</span>
-                  </span>
-                )}
               </div>
             </div>
           )
@@ -929,7 +924,7 @@ export default function AdminDashboard() {
         )
       }
 
-      const chartWidth = 800
+      const chartWidth = 950
       const chartHeight = 300
       const padding = { top: 20, right: 20, bottom: 40, left: 50 }
       const innerWidth = chartWidth - padding.left - padding.right
@@ -941,13 +936,33 @@ export default function AdminDashboard() {
       const maxActiveChats = Math.max(...data.map(d => d.activeChats))
       const maxValue = Math.max(maxActiveUsers, maxNewUsers, maxActiveChats) * 1.1
 
-      // Создаем точки для линий
+      // Создаем точки для линий с плавными кривыми
       const createLine = (dataKey) => {
-        return data.map((d, i) => {
-          const x = padding.left + (i / (data.length - 1)) * innerWidth
-          const y = padding.top + innerHeight - (d[dataKey] / maxValue) * innerHeight
-          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-        }).join(' ')
+        const points = data.map((d, i) => ({
+          x: padding.left + (i / (data.length - 1)) * innerWidth,
+          y: padding.top + innerHeight - (d[dataKey] / maxValue) * innerHeight
+        }))
+
+        if (points.length < 2) return ''
+
+        let path = `M ${points[0].x} ${points[0].y}`
+
+        // Создаем плавные кривые с помощью кубических кривых Безье
+        for (let i = 0; i < points.length - 1; i++) {
+          const current = points[i]
+          const next = points[i + 1]
+
+          // Вычисляем контрольные точки для плавности
+          const tension = 0.3 // Коэффициент натяжения кривой
+          const cp1x = current.x + (next.x - current.x) * tension
+          const cp1y = current.y
+          const cp2x = next.x - (next.x - current.x) * tension
+          const cp2y = next.y
+
+          path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`
+        }
+
+        return path
       }
 
       const colors = {
@@ -969,10 +984,12 @@ export default function AdminDashboard() {
             activeChats: dataPoint.activeChats
           }
         })
+        setHoveredDataIndex(index)
       }
 
       const handleMouseLeave = () => {
         setTooltip({ visible: false, x: 0, y: 0, data: null })
+        setHoveredDataIndex(null)
       }
 
       return (
@@ -995,7 +1012,7 @@ export default function AdminDashboard() {
                     y2={padding.top + innerHeight * (1 - ratio)}
                     stroke="var(--border-default)"
                     strokeDasharray="4 4"
-                    opacity="0.3"
+                    opacity="0.5"
                   />
                   <text
                     x={padding.left - 10}
@@ -1084,6 +1101,54 @@ export default function AdminDashboard() {
                   </text>
                 )
               })}
+
+              {/* Направляющая линия и маркеры при наведении */}
+              {hoveredDataIndex !== null && (
+                <>
+                  {/* Вертикальная направляющая линия */}
+                  <line
+                    x1={padding.left + (hoveredDataIndex / (data.length - 1)) * innerWidth}
+                    y1={padding.top}
+                    x2={padding.left + (hoveredDataIndex / (data.length - 1)) * innerWidth}
+                    y2={padding.top + innerHeight}
+                    stroke="var(--text-secondary)"
+                    strokeWidth="1"
+                    strokeDasharray="4 2"
+                    opacity="0.5"
+                  />
+                  {/* Маркеры на линиях */}
+                  {activeSeries.includes('activeUsers') && (
+                    <circle
+                      cx={padding.left + (hoveredDataIndex / (data.length - 1)) * innerWidth}
+                      cy={padding.top + innerHeight - (data[hoveredDataIndex].activeUsers / maxValue) * innerHeight}
+                      r="5"
+                      fill={colors.activeUsers}
+                      stroke="white"
+                      strokeWidth="2"
+                    />
+                  )}
+                  {activeSeries.includes('newUsers') && (
+                    <circle
+                      cx={padding.left + (hoveredDataIndex / (data.length - 1)) * innerWidth}
+                      cy={padding.top + innerHeight - (data[hoveredDataIndex].newUsers / maxValue) * innerHeight}
+                      r="5"
+                      fill={colors.newUsers}
+                      stroke="white"
+                      strokeWidth="2"
+                    />
+                  )}
+                  {activeSeries.includes('activeChats') && (
+                    <circle
+                      cx={padding.left + (hoveredDataIndex / (data.length - 1)) * innerWidth}
+                      cy={padding.top + innerHeight - (data[hoveredDataIndex].activeChats / maxValue) * innerHeight}
+                      r="5"
+                      fill={colors.activeChats}
+                      stroke="white"
+                      strokeWidth="2"
+                    />
+                  )}
+                </>
+              )}
             </svg>
           </div>
           <div className="chart-legend">
@@ -1113,7 +1178,7 @@ export default function AdminDashboard() {
         )
       }
 
-      const chartWidth = 800
+      const chartWidth = 950
       const chartHeight = 300
       const padding = { top: 20, right: 60, bottom: 40, left: 50 }
       const innerWidth = chartWidth - padding.left - padding.right
@@ -1132,6 +1197,35 @@ export default function AdminDashboard() {
         tokens: '#ef4444'
       }
 
+      // Создаем плавную линию для токенов
+      const createTokensLine = () => {
+        const points = data.map((d, i) => ({
+          x: padding.left + (i / data.length) * innerWidth + barWidth / 2,
+          y: padding.top + innerHeight - (d.tokens / maxTokens) * innerHeight
+        }))
+
+        if (points.length < 2) return ''
+
+        let path = `M ${points[0].x} ${points[0].y}`
+
+        // Создаем плавные кривые с помощью кубических кривых Безье
+        for (let i = 0; i < points.length - 1; i++) {
+          const current = points[i]
+          const next = points[i + 1]
+
+          // Вычисляем контрольные точки для плавности
+          const tension = 0.3
+          const cp1x = current.x + (next.x - current.x) * tension
+          const cp1y = current.y
+          const cp2x = next.x - (next.x - current.x) * tension
+          const cp2y = next.y
+
+          path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`
+        }
+
+        return path
+      }
+
       const handleMouseMove = (event, dataPoint, index) => {
         setTooltip({
           visible: true,
@@ -1147,10 +1241,12 @@ export default function AdminDashboard() {
             total: dataPoint.gpt4 + dataPoint.gpt35 + dataPoint.claude3 + dataPoint.gemini
           }
         })
+        setHoveredDataIndex(index)
       }
 
       const handleMouseLeave = () => {
         setTooltip({ visible: false, x: 0, y: 0, data: null })
+        setHoveredDataIndex(null)
       }
 
       return (
@@ -1172,7 +1268,7 @@ export default function AdminDashboard() {
                   y2={padding.top + innerHeight * (1 - ratio)}
                   stroke="var(--border-default)"
                   strokeDasharray="4 4"
-                  opacity="0.3"
+                  opacity="0.5"
                 />
                 <text
                   x={padding.left - 10}
@@ -1286,11 +1382,7 @@ export default function AdminDashboard() {
             {/* Линия токенов */}
             {activeSeries.includes('totalTokens') && (
               <path
-                d={data.map((d, i) => {
-                  const x = padding.left + (i / data.length) * innerWidth + barWidth / 2
-                  const y = padding.top + innerHeight - (d.tokens / maxTokens) * innerHeight
-                  return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-                }).join(' ')}
+                d={createTokensLine()}
                 fill="none"
                 stroke={colors.tokens}
                 strokeWidth="2"
@@ -1334,6 +1426,34 @@ export default function AdminDashboard() {
                 </text>
               )
             })}
+
+            {/* Направляющая линия и маркеры при наведении */}
+            {hoveredDataIndex !== null && (
+              <>
+                {/* Вертикальная направляющая линия */}
+                <line
+                  x1={padding.left + (hoveredDataIndex / data.length) * innerWidth + barWidth / 2}
+                  y1={padding.top}
+                  x2={padding.left + (hoveredDataIndex / data.length) * innerWidth + barWidth / 2}
+                  y2={padding.top + innerHeight}
+                  stroke="var(--text-secondary)"
+                  strokeWidth="1"
+                  strokeDasharray="4 2"
+                  opacity="0.5"
+                />
+                {/* Маркер на линии токенов */}
+                {activeSeries.includes('totalTokens') && (
+                  <circle
+                    cx={padding.left + (hoveredDataIndex / data.length) * innerWidth + barWidth / 2}
+                    cy={padding.top + innerHeight - (data[hoveredDataIndex].tokens / maxTokens) * innerHeight}
+                    r="5"
+                    fill={colors.tokens}
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                )}
+              </>
+            )}
           </svg>
           <div className="chart-legend">
             <div className="chart-legend-item">
