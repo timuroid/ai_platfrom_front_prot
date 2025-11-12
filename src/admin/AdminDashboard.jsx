@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar.jsx'
 import EmptyState from './components/EmptyState.jsx'
+import DateRangePicker from './components/DateRangePicker.jsx'
 import './Admin.css'
 
 const MODEL_OPTIONS = [
@@ -118,14 +119,20 @@ const MANAGEMENT_SECTIONS = {
       },
       {
         id: 'type',
-        label: 'Тип',
+        label: 'Формат',
         type: 'select',
         options: [
           { value: 'all', label: 'Все' },
-          { value: 'image', label: 'Изображение' },
-          { value: 'document', label: 'Документ' },
-          { value: 'video', label: 'Видео' },
-          { value: 'audio', label: 'Аудио' }
+          { value: 'pdf', label: 'PDF' },
+          { value: 'png', label: 'PNG' },
+          { value: 'jpg', label: 'JPG' },
+          { value: 'jpeg', label: 'JPEG' },
+          { value: 'xlsx', label: 'XLSX' },
+          { value: 'csv', label: 'CSV' },
+          { value: 'doc', label: 'DOC' },
+          { value: 'docx', label: 'DOCX' },
+          { value: 'html', label: 'HTML' },
+          { value: 'txt', label: 'TXT' }
         ]
       }
     ]
@@ -431,9 +438,10 @@ export default function AdminDashboard() {
         if (sectionFilters.dlpStatus && sectionFilters.dlpStatus !== 'all') {
           if (item.dlpStatus !== sectionFilters.dlpStatus) return false
         }
-        // Фильтр по типу
+        // Фильтр по формату
         if (sectionFilters.type && sectionFilters.type !== 'all') {
-          if (item.type !== sectionFilters.type) return false
+          const extension = getFileExtension(item.name).toLowerCase()
+          if (extension !== sectionFilters.type.toLowerCase()) return false
         }
       }
 
@@ -727,33 +735,22 @@ export default function AdminDashboard() {
   )
 
   const renderDashboardFilters = () => {
+    const fromDate = dashboardFilters.from ? new Date(dashboardFilters.from) : null
+    const toDate = dashboardFilters.to ? new Date(dashboardFilters.to) : null
+
     return (
       <div className="filters-grid management-filters dashboard-filters">
         <div className="field">
           <span>Период</span>
-          <div className="date-range-wrapper">
-            <div className="date-range-field">
-              <label className="date-range-label">От</label>
-              <input
-                type="date"
-                className="date-input"
-                value={dashboardFilters.from}
-                onChange={(event) => updateFilter('dashboards', 'from', event.target.value)}
-                placeholder="От"
-              />
-            </div>
-            <div className="date-range-separator">—</div>
-            <div className="date-range-field">
-              <label className="date-range-label">До</label>
-              <input
-                type="date"
-                className="date-input"
-                value={dashboardFilters.to}
-                onChange={(event) => updateFilter('dashboards', 'to', event.target.value)}
-                placeholder="До"
-              />
-            </div>
-          </div>
+          <DateRangePicker
+            startDate={fromDate}
+            endDate={toDate}
+            onChange={(start, end) => {
+              updateFilter('dashboards', 'from', start ? start.toISOString().split('T')[0] : '')
+              updateFilter('dashboards', 'to', end ? end.toISOString().split('T')[0] : '')
+            }}
+            placeholder="Выберите период"
+          />
         </div>
         {renderSelectDropdown({
           sectionId: 'dashboards',
@@ -793,34 +790,22 @@ export default function AdminDashboard() {
     if (filter.type === 'date-range') {
       const fromValue = filters[sectionId][filter.fromField] || ''
       const toValue = filters[sectionId][filter.toField] || ''
+      const fromDate = fromValue ? new Date(fromValue) : null
+      const toDate = toValue ? new Date(toValue) : null
       const showBulk = sectionId === 'users' && selectedUsers.length > 0
 
       return (
         <div className="field period-field-with-actions" key={filter.id}>
           <span>{filter.label}</span>
-          <div className={`date-range-wrapper ${showBulk ? 'with-bulk-actions' : ''}`}>
-            <div className="date-range-field">
-              <label className="date-range-label">От</label>
-              <input
-                type="date"
-                className="date-input"
-                value={fromValue}
-                onChange={(event) => updateFilter(sectionId, filter.fromField, event.target.value)}
-                placeholder="От"
-              />
-            </div>
-            <div className="date-range-separator">—</div>
-            <div className="date-range-field">
-              <label className="date-range-label">До</label>
-              <input
-                type="date"
-                className="date-input"
-                value={toValue}
-                onChange={(event) => updateFilter(sectionId, filter.toField, event.target.value)}
-                placeholder="До"
-              />
-            </div>
-          </div>
+          <DateRangePicker
+            startDate={fromDate}
+            endDate={toDate}
+            onChange={(start, end) => {
+              updateFilter(sectionId, filter.fromField, start ? start.toISOString().split('T')[0] : '')
+              updateFilter(sectionId, filter.toField, end ? end.toISOString().split('T')[0] : '')
+            }}
+            placeholder="Выберите период"
+          />
           {showBulk && (
             <div className="bulk-actions-inline">
               <div className="bulk-actions-info">
