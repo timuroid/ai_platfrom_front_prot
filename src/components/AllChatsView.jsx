@@ -1,48 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, ArrowLeft, Search, Plus, Trash2, Calendar } from 'lucide-react';
-import './AllChats.css';
+import { MessageSquare, Search, Plus, Trash2, Calendar } from 'lucide-react';
+import './AllChatsView.css';
 
-export default function AllChats() {
-  const [chats, setChats] = useState([]);
+export default function AllChatsView({ chats, onChatSelect, onNewChat, onDeleteChat }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredChats, setFilteredChats] = useState([]);
 
   useEffect(() => {
-    // Загружаем чаты из localStorage или используем моковые данные
-    const savedChatsData = localStorage.getItem('chat_history');
-    let loadedChats = [];
-
-    if (savedChatsData) {
-      try {
-        loadedChats = JSON.parse(savedChatsData);
-      } catch (e) {
-        console.error('Failed to parse chats:', e);
-      }
-    }
-
-    // Если нет сохраненных чатов, создаем моковые данные
-    if (loadedChats.length === 0) {
-      loadedChats = [
-        {
-          id: 1,
-          title: 'Новый чат',
-          messages: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
-    }
-
-    // Добавляем дату создания и обновления, если их нет
-    loadedChats = loadedChats.map(chat => ({
-      ...chat,
-      createdAt: chat.createdAt || new Date().toISOString(),
-      updatedAt: chat.updatedAt || new Date().toISOString()
-    }));
-
-    setChats(loadedChats);
-    setFilteredChats(loadedChats);
-  }, []);
+    setFilteredChats(chats);
+  }, [chats]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -56,30 +22,6 @@ export default function AllChats() {
       setFilteredChats(filtered);
     }
   }, [searchQuery, chats]);
-
-  const handleBackToChat = () => {
-    window.location.hash = '/';
-  };
-
-  const handleChatClick = (chatId) => {
-    localStorage.setItem('active_chat_id', chatId.toString());
-    window.location.hash = '/';
-  };
-
-  const handleNewChat = () => {
-    window.location.hash = '/';
-    // Триггерим событие для создания нового чата
-    window.dispatchEvent(new CustomEvent('create-new-chat'));
-  };
-
-  const handleDeleteChat = (e, chatId) => {
-    e.stopPropagation();
-    if (confirm('Вы уверены, что хотите удалить этот чат?')) {
-      const updatedChats = chats.filter(chat => chat.id !== chatId);
-      setChats(updatedChats);
-      localStorage.setItem('chat_history', JSON.stringify(updatedChats));
-    }
-  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -111,33 +53,19 @@ export default function AllChats() {
     return text.length > 100 ? text.substring(0, 100) + '...' : text;
   };
 
+  const handleDelete = (e, chatId) => {
+    e.stopPropagation();
+    if (confirm('Вы уверены, что хотите удалить этот чат?')) {
+      onDeleteChat(chatId);
+    }
+  };
+
   return (
-    <div className="all-chats-container">
-      <header className="all-chats-header">
-        <div className="all-chats-header-content">
-          <button
-            type="button"
-            className="back-button"
-            onClick={handleBackToChat}
-            title="Назад к чату"
-          >
-            <ArrowLeft size={20} />
-          </button>
+    <div className="all-chats-view">
+      <div className="all-chats-view-header">
+        <h2 className="all-chats-view-title">Все чаты</h2>
 
-          <h1 className="all-chats-title">Все чаты</h1>
-
-          <button
-            type="button"
-            className="new-chat-button"
-            onClick={handleNewChat}
-            title="Новый чат"
-          >
-            <Plus size={20} />
-            <span>Новый чат</span>
-          </button>
-        </div>
-
-        <div className="search-container">
+        <div className="all-chats-view-actions">
           <div className="search-input-wrapper">
             <Search size={18} className="search-icon" />
             <input
@@ -149,13 +77,13 @@ export default function AllChats() {
             />
           </div>
         </div>
-      </header>
+      </div>
 
-      <div className="all-chats-content">
+      <div className="all-chats-view-content">
         {filteredChats.length === 0 ? (
           <div className="empty-state">
             <MessageSquare size={64} />
-            <h2>Нет чатов</h2>
+            <h3>Нет чатов</h3>
             <p>
               {searchQuery.trim() !== ''
                 ? 'По вашему запросу ничего не найдено'
@@ -164,7 +92,7 @@ export default function AllChats() {
             <button
               type="button"
               className="primary-button"
-              onClick={handleNewChat}
+              onClick={onNewChat}
             >
               <Plus size={18} />
               Создать чат
@@ -176,7 +104,7 @@ export default function AllChats() {
               <div
                 key={chat.id}
                 className="chat-card"
-                onClick={() => handleChatClick(chat.id)}
+                onClick={() => onChatSelect(chat)}
               >
                 <div className="chat-card-header">
                   <div className="chat-card-icon">
@@ -185,7 +113,7 @@ export default function AllChats() {
                   <button
                     type="button"
                     className="delete-button"
-                    onClick={(e) => handleDeleteChat(e, chat.id)}
+                    onClick={(e) => handleDelete(e, chat.id)}
                     title="Удалить чат"
                   >
                     <Trash2 size={16} />
@@ -202,7 +130,7 @@ export default function AllChats() {
                 <div className="chat-card-footer">
                   <div className="chat-card-meta">
                     <Calendar size={14} />
-                    <span>{formatDate(chat.updatedAt)}</span>
+                    <span>{formatDate(chat.updatedAt || chat.createdAt || new Date().toISOString())}</span>
                   </div>
                   <div className="chat-card-count">
                     {chat.messages.length}{' '}
