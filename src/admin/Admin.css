@@ -696,7 +696,7 @@
 
 .chart-bar {
   transform-origin: bottom;
-  animation: growBar 0.8s ease-out forwards;
+  animation: growBar 1.2s ease-in-out forwards;
 }
 
 @keyframes growBar {
