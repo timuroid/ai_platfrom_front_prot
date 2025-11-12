@@ -67,17 +67,16 @@ const MANAGEMENT_SECTIONS = {
     title: 'Пользователи',
     columns: ['Пользователь', 'Первая активность', 'Последняя активность', 'Диалоги', 'Сообщения', 'Вызовы инструментов', 'Загрузки', 'Tokens in/out', 'Стоимость $', '% отклонённых', '% лайков'],
     filters: [
-      { id: 'activityFrom', label: 'Активность с', type: 'date' },
-      { id: 'activityTo', label: 'Активность по', type: 'date' },
-      { id: 'model', label: 'Модель', type: 'select', options: MODEL_OPTIONS },
+      { id: 'period', label: 'Период', type: 'date-range', fromField: 'activityFrom', toField: 'activityTo' },
+      { id: 'fio', label: 'Поиск по ФИО', type: 'text', placeholder: 'Введите ФИО' },
       {
-        id: 'status',
-        label: 'Статус',
+        id: 'role',
+        label: 'Роль',
         type: 'select',
         options: [
           { value: 'all', label: 'Все' },
-          { value: 'new', label: 'Новый' },
-          { value: 'return', label: 'Возврат' }
+          { value: 'admin', label: 'Администратор' },
+          { value: 'user', label: 'Пользователь' }
         ]
       }
     ]
@@ -86,51 +85,14 @@ const MANAGEMENT_SECTIONS = {
     title: 'Диалоги',
     columns: ['Диалог', 'Пользователь', 'Старт', 'Сообщений', 'Инструменты', 'Файлы', 'Голос', 'Tokens in/out', 'Стоимость $', 'Ср. TTFT/TTLT', 'Причина завершения'],
     filters: [
-      { id: 'periodFrom', label: 'Период с', type: 'date' },
-      { id: 'periodTo', label: 'Период по', type: 'date' },
-      { id: 'model', label: 'Модель', type: 'select', options: MODEL_OPTIONS },
-      {
-        id: 'status',
-        label: 'Статус',
-        type: 'select',
-        options: [
-          { value: 'all', label: 'Все' },
-          { value: 'active', label: 'Активен' },
-          { value: 'closed', label: 'Закрыт' }
-        ]
-      },
-      {
-        id: 'traits',
-        label: 'Признаки',
-        type: 'checkbox-group',
-        options: [
-          { value: 'tools', label: 'Есть инструменты' },
-          { value: 'files', label: 'Есть файлы' },
-          { value: 'voice', label: 'Есть голос' }
-        ]
-      }
+      { id: 'period', label: 'Период', type: 'date-range', fromField: 'periodFrom', toField: 'periodTo' }
     ]
   },
   files: {
     title: 'Файлы',
     columns: ['Имя', 'Тип', 'Размер (MB)', 'Загружен', 'Пользователь', 'Диалог', 'DLP отклонён', 'Причина', 'Назначение', 'Модель'],
     filters: [
-      { id: 'periodFrom', label: 'Период с', type: 'date' },
-      { id: 'periodTo', label: 'Период по', type: 'date' },
-      {
-        id: 'type',
-        label: 'Тип',
-        type: 'select',
-        options: [
-          { value: 'all', label: 'Все' },
-          { value: 'docx', label: 'DOCX' },
-          { value: 'xlsx', label: 'XLSX' },
-          { value: 'csv', label: 'CSV' },
-          { value: 'pdf', label: 'PDF' },
-          { value: 'img', label: 'Изображения' },
-          { value: 'other', label: 'Другие' }
-        ]
-      },
+      { id: 'period', label: 'Период', type: 'date-range', fromField: 'periodFrom', toField: 'periodTo' },
       {
         id: 'status',
         label: 'Статус',
@@ -140,9 +102,7 @@ const MANAGEMENT_SECTIONS = {
           { value: 'approved', label: 'Принят' },
           { value: 'rejected', label: 'Отклонён' }
         ]
-      },
-      { id: 'sizeMin', label: 'Размер от (MB)', type: 'number' },
-      { id: 'sizeMax', label: 'Размер до (MB)', type: 'number' }
+      }
     ]
   },
   tools: {
@@ -187,9 +147,9 @@ const DASHBOARD_FILTER_KEYS = ['from', 'to', 'model']
 
 const DEFAULT_FILTERS = {
   dashboards: { from: '', to: '', model: 'all' },
-  users: { activityFrom: '', activityTo: '', model: 'all', status: 'all' },
-  dialogs: { periodFrom: '', periodTo: '', model: 'all', status: 'all', traits: [] },
-  files: { periodFrom: '', periodTo: '', type: 'all', status: 'all', sizeMin: '', sizeMax: '' },
+  users: { activityFrom: '', activityTo: '', fio: '', role: 'all' },
+  dialogs: { periodFrom: '', periodTo: '' },
+  files: { periodFrom: '', periodTo: '', status: 'all' },
   tools: { status: 'all', search: '' },
   models: { status: 'all', provider: '' }
 }
@@ -557,6 +517,44 @@ export default function AdminDashboard() {
 
   const renderFilterControl = (sectionId, filter) => {
     const value = filters[sectionId][filter.id]
+
+    if (filter.type === 'date-range') {
+      const fromValue = filters[sectionId][filter.fromField] || ''
+      const toValue = filters[sectionId][filter.toField] || ''
+
+      const formatDateRange = () => {
+        if (!fromValue && !toValue) return 'Выберите период'
+        if (fromValue && toValue) {
+          return `${new Date(fromValue).toLocaleDateString('ru-RU')} — ${new Date(toValue).toLocaleDateString('ru-RU')}`
+        }
+        if (fromValue) return `С ${new Date(fromValue).toLocaleDateString('ru-RU')}`
+        return `До ${new Date(toValue).toLocaleDateString('ru-RU')}`
+      }
+
+      return (
+        <div className="field" key={filter.id}>
+          <span>{filter.label}</span>
+          <div className="date-range-picker">
+            <span className="date-range-display">{formatDateRange()}</span>
+            <input
+              type="date"
+              className="date-range-input"
+              value={fromValue}
+              onChange={(event) => updateFilter(sectionId, filter.fromField, event.target.value)}
+              placeholder="От"
+            />
+            <input
+              type="date"
+              className="date-range-input"
+              value={toValue}
+              onChange={(event) => updateFilter(sectionId, filter.toField, event.target.value)}
+              placeholder="До"
+            />
+          </div>
+        </div>
+      )
+    }
+
     if (filter.type === 'checkbox-group') {
       return (
         <div className="field checkbox-field" key={filter.id}>
@@ -581,7 +579,7 @@ export default function AdminDashboard() {
       return renderSelectDropdown({ sectionId, filter })
     }
 
-    const inputType = filter.type === 'number' ? 'number' : 'date'
+    const inputType = filter.type === 'number' ? 'number' : filter.type === 'text' ? 'text' : 'date'
     const fieldClassName = `field ${inputType === 'date' ? 'field-date' : ''}`
 
     return (
