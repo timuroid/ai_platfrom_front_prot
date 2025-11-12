@@ -1142,36 +1142,38 @@ export default function AdminDashboard() {
         <header className="page-toolbar">
           <h1 className="page-heading">{currentManagement.title}</h1>
         </header>
-        <div className="admin-content">
-          <button
-            type="button"
-            className={`filters-toggle ${filtersOpen ? 'is-open' : ''}`}
-            onClick={() => setFiltersOpen(!filtersOpen)}
-          >
-            <span>
-              Фильтры
-              {activeFiltersCount > 0 && (
-                <span className="filters-toggle-badge">{activeFiltersCount}</span>
-              )}
-            </span>
-            <ChevronDown size={20} />
-          </button>
-          <div className={`filters-grid management-filters is-collapsible ${filtersOpen ? 'is-open' : ''}`}>
-            {currentManagement.filters.map((filter) => renderFilterControl(section, filter))}
-          </div>
-          <section className="card table-card">
-            <header className="card-header">
-              <p className="card-title">{currentManagement.title}</p>
-            </header>
-            <div className="card-body">
-              <div className="table-scroll">
-                <table className="data-table">
-                  {renderTableHeader()}
-                  {renderTableBody()}
-                </table>
-              </div>
+        <div className="admin-viewport">
+          <div className="admin-content">
+            <button
+              type="button"
+              className={`filters-toggle ${filtersOpen ? 'is-open' : ''}`}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            >
+              <span>
+                Фильтры
+                {activeFiltersCount > 0 && (
+                  <span className="filters-toggle-badge">{activeFiltersCount}</span>
+                )}
+              </span>
+              <ChevronDown size={20} />
+            </button>
+            <div className={`filters-grid management-filters is-collapsible ${filtersOpen ? 'is-open' : ''}`}>
+              {currentManagement.filters.map((filter) => renderFilterControl(section, filter))}
             </div>
-          </section>
+            <section className="card table-card">
+              <header className="card-header">
+                <p className="card-title">{currentManagement.title}</p>
+              </header>
+              <div className="card-body">
+                <div className="table-scroll">
+                  <table className="data-table">
+                    {renderTableHeader()}
+                    {renderTableBody()}
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
       </>
     )
@@ -1313,21 +1315,23 @@ export default function AdminDashboard() {
         {section === 'dashboards' ? (
           <>
             {renderDashboardToolbar()}
-            <div className="admin-content dashboards-view">
-              {renderDashboardFilters()}
-              <div className="mode-switch-grid">
-                {DASHBOARD_MODE_IDS.map((modeId) => (
-                  <button
-                    key={modeId}
-                    type="button"
-                    className={`dashboard-mode-button ${dashboardMode === modeId ? 'is-active' : ''}`}
-                    onClick={() => setDashboardMode(modeId)}
-                  >
-                    <span className="mode-title">{DASHBOARD_MODES[modeId].title}</span>
-                  </button>
-                ))}
+            <div className="admin-viewport">
+              <div className="admin-content dashboards-view">
+                {renderDashboardFilters()}
+                <div className="mode-switch-grid">
+                  {DASHBOARD_MODE_IDS.map((modeId) => (
+                    <button
+                      key={modeId}
+                      type="button"
+                      className={`dashboard-mode-button ${dashboardMode === modeId ? 'is-active' : ''}`}
+                      onClick={() => setDashboardMode(modeId)}
+                    >
+                      <span className="mode-title">{DASHBOARD_MODES[modeId].title}</span>
+                    </button>
+                  ))}
+                </div>
+                {renderDashboardAnalytics()}
               </div>
-              {renderDashboardAnalytics()}
             </div>
           </>
         ) : (
