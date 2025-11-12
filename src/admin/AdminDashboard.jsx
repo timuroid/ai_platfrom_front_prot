@@ -42,45 +42,7 @@ const DASHBOARD_MODES = {
       { id: 'newUsers', label: 'Новые пользователи', icon: TrendingUp, trend: 'up', trendValue: '+8%' },
       { id: 'newDialogs', label: 'Новые диалоги', icon: MessageSquare, trend: 'up', trendValue: '+15%' },
       { id: 'stickiness', label: 'Приверженность', icon: Target, trend: 'neutral', trendValue: '45%' }
-    ],
-    detailColumns: ['Дата', 'DAU', 'Новые пользователи', 'Новые диалоги', 'Сообщения']
-  },
-  content: {
-    id: 'content',
-    title: 'Контент',
-    defaultSeries: ['docx', 'pdf', 'img'],
-    series: [
-      { id: 'docx', label: 'DOCX' },
-      { id: 'xlsx', label: 'XLSX' },
-      { id: 'csv', label: 'CSV' },
-      { id: 'pdf', label: 'PDF' },
-      { id: 'img', label: 'Изображения' },
-      { id: 'other', label: 'Другие' }
-    ],
-    kpis: [
-      { id: 'uploads', label: 'Загрузки/день', icon: FileUp, trend: 'up', trendValue: '+23%' },
-      { id: 'usersWithFiles', label: '% пользователей', icon: Users, trend: 'up', trendValue: '67%' },
-      { id: 'dlpReject', label: 'DLP %', icon: Activity, trend: 'down', trendValue: '2.1%' },
-      { id: 'avgSize', label: 'Средний размер', icon: FileText, trend: 'neutral', trendValue: '1.2 MB' }
-    ],
-    detailColumns: ['Тип', 'Загрузки', 'Пользователи', 'Средний размер', 'Reject %']
-  },
-  tools: {
-    id: 'tools',
-    title: 'Инструменты',
-    defaultSeries: ['search', 'image'],
-    series: [
-      { id: 'search', label: 'Поиск' },
-      { id: 'image', label: 'Генерация' },
-      { id: 'other', label: 'Прочие' }
-    ],
-    kpis: [
-      { id: 'sessions', label: '% сессий', icon: Target, trend: 'up', trendValue: '34%' },
-      { id: 'invocations', label: 'Вызовов/польз.', icon: Zap, trend: 'up', trendValue: '5.2' },
-      { id: 'searchPerDay', label: 'Поиск/день', icon: Search, trend: 'up', trendValue: '1.2K' },
-      { id: 'imagePerDay', label: 'Изображения/день', icon: Image, trend: 'up', trendValue: '340' }
-    ],
-    detailColumns: ['Инструмент', 'adoption %', 'Вызовы', '/active', '$/invoke', 'Ошибка %']
+    ]
   },
   cost: {
     id: 'cost',
@@ -96,45 +58,7 @@ const DASHBOARD_MODES = {
       { id: 'costPerActive', label: 'Стоимость/активный', icon: Users, trend: 'down', trendValue: '$0.85' },
       { id: 'tokensIn', label: 'Tokens in', icon: TrendingUp, trend: 'up', trendValue: '12.5M' },
       { id: 'tokensOut', label: 'Tokens out', icon: TrendingDown, trend: 'up', trendValue: '8.2M' }
-    ],
-    detailColumns: ['Модель', 'Requests', 'Tokens in', 'Tokens out', 'Cost total', 'Cost/session', 'Доля %']
-  },
-  quality: {
-    id: 'quality',
-    title: 'Качество',
-    defaultSeries: ['ttft', 'ttlt', 'errors'],
-    series: [
-      { id: 'ttft', label: 'TTFT' },
-      { id: 'ttlt', label: 'TTLT' },
-      { id: 'tokensSec', label: 'Tokens/sec' },
-      { id: 'errors', label: 'Ошибки' },
-      { id: 'timeouts', label: 'Таймауты' },
-      { id: 'guardrail', label: 'Guardrail/DLP' }
-    ],
-    kpis: [
-      { id: 'ttftP50', label: 'TTFT P50/P95', icon: Clock, trend: 'down', trendValue: '420ms' },
-      { id: 'ttltP50', label: 'TTLT P50/P95', icon: Clock, trend: 'down', trendValue: '2.1s' },
-      { id: 'tokensSpeed', label: 'Tokens/sec', icon: Zap, trend: 'up', trendValue: '45' },
-      { id: 'errorRate', label: 'Error rate', icon: Activity, trend: 'down', trendValue: '0.8%' }
-    ],
-    detailColumns: ['Модель/канал', 'TTFT', 'TTLT', 'Tokens/sec', 'Error %', 'Timeout %', 'Guardrail %']
-  },
-  cohorts: {
-    id: 'cohorts',
-    title: 'Когорты',
-    defaultSeries: ['d1', 'd7', 'd30'],
-    series: [
-      { id: 'd1', label: 'D1' },
-      { id: 'd7', label: 'D7' },
-      { id: 'd30', label: 'D30' }
-    ],
-    kpis: [
-      { id: 'd1', label: 'D1', icon: Target, trend: 'neutral', trendValue: '78%' },
-      { id: 'd7', label: 'D7', icon: TrendingUp, trend: 'up', trendValue: '52%' },
-      { id: 'd30', label: 'D30', icon: Users, trend: 'up', trendValue: '34%' },
-      { id: 'mPlus1', label: 'M+1', icon: Activity, trend: 'neutral', trendValue: '28%' }
-    ],
-    detailColumns: ['Месяц активации', 'M+1', 'M+2', 'M+3', 'Комментарий']
+    ]
   }
 }
 
@@ -303,7 +227,7 @@ const buildHash = (section, mode, dashboardFilters = {}) => {
   return query ? `#/admin?${query}` : '#/admin'
 }
 
-const ROOT_SECTIONS = ['dashboards', 'users', 'dialogs', 'files', 'tools', 'models']
+const ROOT_SECTIONS = ['dashboards', 'users', 'dialogs', 'files']
 
 export default function AdminDashboard() {
   const initialQuery = useMemo(() => parseHashState(), [])
@@ -569,14 +493,24 @@ export default function AdminDashboard() {
 
   const renderDashboardFilters = () => (
     <div className="filters-grid management-filters dashboard-filters">
-      <label className="field field-date">
-        <span>С (дата)</span>
-        <input type="date" value={dashboardFilters.from} onChange={(event) => updateFilter('dashboards', 'from', event.target.value)} />
-      </label>
-      <label className="field field-date">
-        <span>По (дата)</span>
-        <input type="date" value={dashboardFilters.to} onChange={(event) => updateFilter('dashboards', 'to', event.target.value)} />
-      </label>
+      <div className="field field-date-range">
+        <span>Период</span>
+        <div className="date-range-inputs">
+          <input
+            type="date"
+            value={dashboardFilters.from}
+            onChange={(event) => updateFilter('dashboards', 'from', event.target.value)}
+            placeholder="От"
+          />
+          <span className="date-range-separator">—</span>
+          <input
+            type="date"
+            value={dashboardFilters.to}
+            onChange={(event) => updateFilter('dashboards', 'to', event.target.value)}
+            placeholder="До"
+          />
+        </div>
+      </div>
       {renderSelectDropdown({
         sectionId: 'dashboards',
         filter: { id: 'model', label: 'Модель', options: MODEL_OPTIONS },
@@ -604,7 +538,6 @@ export default function AdminDashboard() {
           </div>
         </section>
         {renderKpis()}
-        {renderAnalyticsDetail()}
       </>
     )
   }
