@@ -40,6 +40,7 @@ export default function Sidebar({
   onChatSelect = () => {},
   onNewChat = () => {},
   onShowSettings = () => {},
+  onViewAllChats = () => {},
   // Props для режима admin
   activeSection = 'dashboards',
   onSectionSelect = () => {}
@@ -76,10 +77,6 @@ export default function Sidebar({
     }
   };
 
-  const handleViewAllChats = () => {
-    window.location.hash = '/chats'
-  }
-
   const renderChatMode = () => (
     <>
       <div className="sidebar-action">
@@ -93,20 +90,6 @@ export default function Sidebar({
             <Plus size={20} />
           </span>
           <span className="sidebar-button-text">Новый чат</span>
-        </button>
-      </div>
-
-      <div className="sidebar-action sidebar-action-secondary">
-        <button
-          type="button"
-          className="sidebar-button sidebar-button-secondary"
-          onClick={handleViewAllChats}
-          title="Смотреть все чаты"
-        >
-          <span className="sidebar-button-icon">
-            <List size={20} />
-          </span>
-          <span className="sidebar-button-text">Смотреть все чаты</span>
         </button>
       </div>
 
@@ -124,6 +107,18 @@ export default function Sidebar({
             <span className="chat-item-text truncate">{chat.title}</span>
           </button>
         ))}
+
+        <button
+          type="button"
+          className="chat-item view-all-chats-btn"
+          onClick={onViewAllChats}
+          title="Смотреть все чаты"
+        >
+          <span className="chat-item-icon">
+            <List size={18} />
+          </span>
+          <span className="chat-item-text">Смотреть все чаты</span>
+        </button>
       </div>
 
       <div className="user-section">

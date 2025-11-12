@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import Sidebar from './components/Sidebar.jsx';
 import TeachingCards from './components/TeachingCards.jsx';
+import AllChatsView from './components/AllChatsView.jsx';
 import './App.css';
 
 const MODELS = [
@@ -235,6 +236,7 @@ export default function LLMChatInterface() {
   const [expandedThinking, setExpandedThinking] = useState({});
   const [streamingMessages, setStreamingMessages] = useState(new Map());
   const [showTeachingCards, setShowTeachingCards] = useState(false);
+  const [showAllChats, setShowAllChats] = useState(false);
   const streamingIntervalsRef = useRef(new Map());
   const toolsMenuRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -290,16 +292,36 @@ export default function LLMChatInterface() {
     const newChat = {
       id: Date.now(),
       title: 'Новый чат',
-      messages: []
+      messages: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     setChats((prev) => [newChat, ...prev]);
     setActiveChat(newChat.id);
     setMessages([]);
+    setShowAllChats(false);
   };
 
   const handleChatSelect = (chat) => {
     setActiveChat(chat.id);
     setMessages(chat.messages || []);
+    setShowAllChats(false);
+  };
+
+  const handleDeleteChat = (chatId) => {
+    setChats((prev) => prev.filter(chat => chat.id !== chatId));
+    if (activeChat === chatId) {
+      const remainingChats = chats.filter(chat => chat.id !== chatId);
+      if (remainingChats.length > 0) {
+        handleChatSelect(remainingChats[0]);
+      } else {
+        createNewChat();
+      }
+    }
+  };
+
+  const handleViewAllChats = () => {
+    setShowAllChats(true);
   };
 
   const handleKeyPress = (event) => {
@@ -603,6 +625,7 @@ export default function LLMChatInterface() {
         onChatSelect={handleChatSelect}
         onNewChat={createNewChat}
         onShowSettings={() => setShowSettings(true)}
+        onViewAllChats={handleViewAllChats}
       />
 
       <style>{`
@@ -677,7 +700,14 @@ export default function LLMChatInterface() {
               <div ref={messagesContainerRef} className="messages-viewport">
                 <div className="messages-scroll">
                   <div className="messages-stack">
-                {messages.length === 0 ? (
+                {showAllChats ? (
+              <AllChatsView
+                chats={chats}
+                onChatSelect={handleChatSelect}
+                onNewChat={createNewChat}
+                onDeleteChat={handleDeleteChat}
+              />
+            ) : messages.length === 0 ? (
               <div className="welcome-screen">
                 <div className="welcome-header">
                   <MessageSquare size={64} className="welcome-icon" />
