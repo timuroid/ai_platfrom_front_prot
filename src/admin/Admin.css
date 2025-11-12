@@ -6,8 +6,6 @@
   --admin-section-gap: clamp(var(--space-4), 2vw, var(--space-6));
   display: flex;
   min-height: 100vh;
-  height: 100vh;
-  overflow: hidden;
   background: var(--surface-canvas);
   color: var(--text-primary);
 }
@@ -21,13 +19,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  scrollbar-gutter: stable;
-  overscroll-behavior: contain;
+  min-height: 100vh;
   background: var(--surface-canvas);
 }
 
@@ -426,9 +418,6 @@
 .admin-content {
   padding: var(--space-4) var(--admin-content-gutter) var(--space-8);
   flex: 1;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -560,6 +549,7 @@
 
 .card-body {
   padding: var(--admin-card-padding);
+  overflow: visible;
 }
 
 .chart-placeholder {
@@ -757,7 +747,9 @@
 .table-scroll {
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
   position: relative;
+  max-height: none;
 }
 
 .table-scroll::after {
