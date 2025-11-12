@@ -74,8 +74,8 @@ const DASHBOARD_MODES = {
 const MANAGEMENT_SECTIONS = {
   users: {
     title: 'Пользователи',
-    columns: ['ФИО', 'Роль', 'Дата последней активности', 'Количество активных чатов', 'Количество сообщений', 'Потрачено денег'],
-    sortableColumns: ['fio', 'role', 'lastActivity', 'activeChats', 'messagesCount', 'moneySpent'],
+    columns: ['ФИО', 'Роль', 'Дата последней активности', 'Количество активных чатов', 'Количество сообщений', 'Потрачено денег', 'Текущие лимиты', 'Доступные инструменты', 'Доступные модели'],
+    sortableColumns: ['fio', 'role', 'lastActivity', 'activeChats', 'messagesCount', 'moneySpent', null, null, null],
     filters: [
       { id: 'period', label: 'Период', type: 'date-range', fromField: 'activityFrom', toField: 'activityTo' },
       { id: 'fio', label: 'Поиск по ФИО', type: 'text', placeholder: 'Введите ФИО' },
@@ -169,14 +169,14 @@ const MANAGEMENT_SECTIONS = {
 
 // Моковые данные
 const MOCK_USERS = [
-  { id: 1, fio: 'Иванов Иван Иванович', role: 'admin', lastActivity: '2025-11-12T10:30:00', activeChats: 5, messagesCount: 342, moneySpent: 125.50 },
-  { id: 2, fio: 'Петрова Мария Сергеевна', role: 'user', lastActivity: '2025-11-11T15:22:00', activeChats: 3, messagesCount: 156, moneySpent: 45.20 },
-  { id: 3, fio: 'Сидоров Петр Александрович', role: 'user', lastActivity: '2025-11-10T09:15:00', activeChats: 7, messagesCount: 521, moneySpent: 189.75 },
-  { id: 4, fio: 'Козлова Анна Дмитриевна', role: 'user', lastActivity: '2025-11-12T14:45:00', activeChats: 2, messagesCount: 89, moneySpent: 28.90 },
-  { id: 5, fio: 'Морозов Алексей Викторович', role: 'admin', lastActivity: '2025-11-12T11:20:00', activeChats: 4, messagesCount: 267, moneySpent: 95.30 },
-  { id: 6, fio: 'Новикова Елена Павловна', role: 'user', lastActivity: '2025-11-09T16:30:00', activeChats: 1, messagesCount: 43, moneySpent: 15.60 },
-  { id: 7, fio: 'Волков Дмитрий Игоревич', role: 'user', lastActivity: '2025-11-12T08:55:00', activeChats: 6, messagesCount: 412, moneySpent: 152.40 },
-  { id: 8, fio: 'Соколова Ольга Николаевна', role: 'user', lastActivity: '2025-11-11T13:10:00', activeChats: 3, messagesCount: 198, moneySpent: 67.80 }
+  { id: 1, fio: 'Иванов Иван Иванович', role: 'admin', lastActivity: '2025-11-12T10:30:00', activeChats: 5, messagesCount: 342, moneySpent: 125.50, limits: '100 msg/day, $10/day', availableTools: 'Web Search, Calculator, Code Interpreter', availableModels: 'GPT-4, GPT-3.5, Claude 3' },
+  { id: 2, fio: 'Петрова Мария Сергеевна', role: 'user', lastActivity: '2025-11-11T15:22:00', activeChats: 3, messagesCount: 156, moneySpent: 45.20, limits: '50 msg/day, $5/day', availableTools: 'Web Search', availableModels: 'GPT-3.5' },
+  { id: 3, fio: 'Сидоров Петр Александрович', role: 'user', lastActivity: '2025-11-10T09:15:00', activeChats: 7, messagesCount: 521, moneySpent: 189.75, limits: '150 msg/day, $15/day', availableTools: 'Web Search, Code Interpreter, Calculator', availableModels: 'GPT-4, Claude 3, Gemini Pro' },
+  { id: 4, fio: 'Козлова Анна Дмитриевна', role: 'user', lastActivity: '2025-11-12T14:45:00', activeChats: 2, messagesCount: 89, moneySpent: 28.90, limits: '50 msg/day, $5/day', availableTools: 'Web Search, Calculator', availableModels: 'GPT-3.5' },
+  { id: 5, fio: 'Морозов Алексей Викторович', role: 'admin', lastActivity: '2025-11-12T11:20:00', activeChats: 4, messagesCount: 267, moneySpent: 95.30, limits: '200 msg/day, $20/day', availableTools: 'Web Search, Code Interpreter, Calculator, Image Generation', availableModels: 'GPT-4, GPT-3.5, Claude 3, Gemini Pro' },
+  { id: 6, fio: 'Новикова Елена Павловна', role: 'user', lastActivity: '2025-11-09T16:30:00', activeChats: 1, messagesCount: 43, moneySpent: 15.60, limits: '30 msg/day, $3/day', availableTools: 'Web Search', availableModels: 'GPT-3.5' },
+  { id: 7, fio: 'Волков Дмитрий Игоревич', role: 'user', lastActivity: '2025-11-12T08:55:00', activeChats: 6, messagesCount: 412, moneySpent: 152.40, limits: '100 msg/day, $10/day', availableTools: 'Web Search, Code Interpreter', availableModels: 'GPT-4, Claude 3' },
+  { id: 8, fio: 'Соколова Ольга Николаевна', role: 'user', lastActivity: '2025-11-11T13:10:00', activeChats: 3, messagesCount: 198, moneySpent: 67.80, limits: '75 msg/day, $7.5/day', availableTools: 'Web Search, Calculator', availableModels: 'GPT-4, GPT-3.5' }
 ]
 
 const MOCK_DIALOGS = [
@@ -270,6 +270,7 @@ export default function AdminDashboard() {
   const [sortConfig, setSortConfig] = useState({ column: null, direction: null })
   const [selectedUsers, setSelectedUsers] = useState([])
   const [showBulkActions, setShowBulkActions] = useState(false)
+  const [modalState, setModalState] = useState({ isOpen: false, type: null })
   const dropdownRefs = useRef({})
 
   const dashboardFilters = filters.dashboards || DEFAULT_FILTERS.dashboards
@@ -343,6 +344,31 @@ export default function AdminDashboard() {
     if (sectionId === 'dialogs') return MOCK_DIALOGS
     if (sectionId === 'files') return MOCK_FILES
     return []
+  }
+
+  const getFileExtension = (filename) => {
+    const parts = filename.split('.')
+    if (parts.length > 1) {
+      return parts[parts.length - 1].toUpperCase()
+    }
+    return 'FILE'
+  }
+
+  const getFileTypeColor = (extension) => {
+    const imageTypes = ['PNG', 'JPG', 'JPEG', 'GIF', 'SVG', 'WEBP', 'BMP']
+    const documentTypes = ['PDF', 'DOC', 'DOCX', 'TXT', 'RTF']
+    const spreadsheetTypes = ['XLS', 'XLSX', 'CSV']
+    const videoTypes = ['MP4', 'AVI', 'MOV', 'WMV', 'FLV', 'MKV']
+    const audioTypes = ['MP3', 'WAV', 'OGG', 'M4A', 'FLAC']
+    const codeTypes = ['PY', 'JS', 'JSX', 'TS', 'TSX', 'HTML', 'CSS', 'JSON']
+
+    if (imageTypes.includes(extension)) return 'image'
+    if (documentTypes.includes(extension)) return 'document'
+    if (spreadsheetTypes.includes(extension)) return 'spreadsheet'
+    if (videoTypes.includes(extension)) return 'video'
+    if (audioTypes.includes(extension)) return 'audio'
+    if (codeTypes.includes(extension)) return 'code'
+    return 'other'
   }
 
   const applyFilters = (data, sectionId) => {
@@ -486,9 +512,30 @@ export default function AdminDashboard() {
   }
 
   const handleBulkAction = (action) => {
-    console.log(`Bulk action: ${action} for users:`, selectedUsers)
-    // Здесь будет логика для массовых действий
-    alert(`Действие "${action}" применено к ${selectedUsers.length} пользователям`)
+    if (action === 'disable') {
+      // Для отключения пользователей показываем подтверждение
+      if (window.confirm(`Вы уверены, что хотите отключить ${selectedUsers.length} пользователей?`)) {
+        console.log(`Disabling users:`, selectedUsers)
+        // Здесь будет API запрос для отключения пользователей
+        alert(`${selectedUsers.length} пользователей отключено`)
+        setSelectedUsers([])
+      }
+    } else {
+      // Для остальных действий открываем модальное окно
+      setModalState({ isOpen: true, type: action })
+    }
+  }
+
+  const closeModal = () => {
+    setModalState({ isOpen: false, type: null })
+  }
+
+  const handleModalSubmit = (data) => {
+    console.log(`Modal submit for ${modalState.type}:`, data, 'users:', selectedUsers)
+    // Здесь будет API запрос для обновления данных
+    alert(`Изменения применены к ${selectedUsers.length} пользователям`)
+    closeModal()
+    setSelectedUsers([])
   }
 
   useEffect(() => {
@@ -680,35 +727,32 @@ export default function AdminDashboard() {
   )
 
   const renderDashboardFilters = () => {
-    const formatDateRange = () => {
-      if (!dashboardFilters.from && !dashboardFilters.to) return 'Выберите период'
-      if (dashboardFilters.from && dashboardFilters.to) {
-        return `${new Date(dashboardFilters.from).toLocaleDateString('ru-RU')} — ${new Date(dashboardFilters.to).toLocaleDateString('ru-RU')}`
-      }
-      if (dashboardFilters.from) return `С ${new Date(dashboardFilters.from).toLocaleDateString('ru-RU')}`
-      return `До ${new Date(dashboardFilters.to).toLocaleDateString('ru-RU')}`
-    }
-
     return (
       <div className="filters-grid management-filters dashboard-filters">
         <div className="field">
           <span>Период</span>
-          <div className="date-range-picker">
-            <span className="date-range-display">{formatDateRange()}</span>
-            <input
-              type="date"
-              className="date-range-input"
-              value={dashboardFilters.from}
-              onChange={(event) => updateFilter('dashboards', 'from', event.target.value)}
-              placeholder="От"
-            />
-            <input
-              type="date"
-              className="date-range-input"
-              value={dashboardFilters.to}
-              onChange={(event) => updateFilter('dashboards', 'to', event.target.value)}
-              placeholder="До"
-            />
+          <div className="date-range-wrapper">
+            <div className="date-range-field">
+              <label className="date-range-label">От</label>
+              <input
+                type="date"
+                className="date-input"
+                value={dashboardFilters.from}
+                onChange={(event) => updateFilter('dashboards', 'from', event.target.value)}
+                placeholder="От"
+              />
+            </div>
+            <div className="date-range-separator">—</div>
+            <div className="date-range-field">
+              <label className="date-range-label">До</label>
+              <input
+                type="date"
+                className="date-input"
+                value={dashboardFilters.to}
+                onChange={(event) => updateFilter('dashboards', 'to', event.target.value)}
+                placeholder="До"
+              />
+            </div>
           </div>
         </div>
         {renderSelectDropdown({
@@ -749,36 +793,75 @@ export default function AdminDashboard() {
     if (filter.type === 'date-range') {
       const fromValue = filters[sectionId][filter.fromField] || ''
       const toValue = filters[sectionId][filter.toField] || ''
-
-      const formatDateRange = () => {
-        if (!fromValue && !toValue) return 'Выберите период'
-        if (fromValue && toValue) {
-          return `${new Date(fromValue).toLocaleDateString('ru-RU')} — ${new Date(toValue).toLocaleDateString('ru-RU')}`
-        }
-        if (fromValue) return `С ${new Date(fromValue).toLocaleDateString('ru-RU')}`
-        return `До ${new Date(toValue).toLocaleDateString('ru-RU')}`
-      }
+      const showBulk = sectionId === 'users' && selectedUsers.length > 0
 
       return (
-        <div className="field" key={filter.id}>
+        <div className="field period-field-with-actions" key={filter.id}>
           <span>{filter.label}</span>
-          <div className="date-range-picker">
-            <span className="date-range-display">{formatDateRange()}</span>
-            <input
-              type="date"
-              className="date-range-input"
-              value={fromValue}
-              onChange={(event) => updateFilter(sectionId, filter.fromField, event.target.value)}
-              placeholder="От"
-            />
-            <input
-              type="date"
-              className="date-range-input"
-              value={toValue}
-              onChange={(event) => updateFilter(sectionId, filter.toField, event.target.value)}
-              placeholder="До"
-            />
+          <div className={`date-range-wrapper ${showBulk ? 'with-bulk-actions' : ''}`}>
+            <div className="date-range-field">
+              <label className="date-range-label">От</label>
+              <input
+                type="date"
+                className="date-input"
+                value={fromValue}
+                onChange={(event) => updateFilter(sectionId, filter.fromField, event.target.value)}
+                placeholder="От"
+              />
+            </div>
+            <div className="date-range-separator">—</div>
+            <div className="date-range-field">
+              <label className="date-range-label">До</label>
+              <input
+                type="date"
+                className="date-input"
+                value={toValue}
+                onChange={(event) => updateFilter(sectionId, filter.toField, event.target.value)}
+                placeholder="До"
+              />
+            </div>
           </div>
+          {showBulk && (
+            <div className="bulk-actions-inline">
+              <div className="bulk-actions-info">
+                <span>Выбрано: {selectedUsers.length}</span>
+              </div>
+              <div className="bulk-actions-buttons">
+                <button
+                  type="button"
+                  className="bulk-action-btn btn-danger"
+                  onClick={() => handleBulkAction('disable')}
+                >
+                  <UserX size={16} />
+                  <span>Отключить</span>
+                </button>
+                <button
+                  type="button"
+                  className="bulk-action-btn btn-secondary"
+                  onClick={() => handleBulkAction('limits')}
+                >
+                  <Settings size={16} />
+                  <span>Изменить лимиты</span>
+                </button>
+                <button
+                  type="button"
+                  className="bulk-action-btn btn-secondary"
+                  onClick={() => handleBulkAction('tools')}
+                >
+                  <Wrench size={16} />
+                  <span>Доступ к инструментам</span>
+                </button>
+                <button
+                  type="button"
+                  className="bulk-action-btn btn-secondary"
+                  onClick={() => handleBulkAction('models')}
+                >
+                  <Cpu size={16} />
+                  <span>Доступ к моделям</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )
     }
@@ -942,6 +1025,9 @@ export default function AdminDashboard() {
               <td>{user.activeChats}</td>
               <td>{user.messagesCount}</td>
               <td>${user.moneySpent.toFixed(2)}</td>
+              <td><span className="text-small">{user.limits}</span></td>
+              <td><span className="text-small">{user.availableTools}</span></td>
+              <td><span className="text-small">{user.availableModels}</span></td>
             </tr>
           ))}
         </tbody>
@@ -976,27 +1062,29 @@ export default function AdminDashboard() {
     if (section === 'files') {
       return (
         <tbody>
-          {data.map((file) => (
-            <tr key={file.id}>
-              <td><strong>{file.name}</strong></td>
-              <td>
-                <span className={`type-badge type-${file.type}`}>
-                  {file.type === 'image' ? 'Изображение' :
-                   file.type === 'video' ? 'Видео' :
-                   file.type === 'audio' ? 'Аудио' : 'Документ'}
-                </span>
-              </td>
-              <td>{file.size}</td>
-              <td>{file.user}</td>
-              <td>{file.dialog}</td>
-              <td>{new Date(file.uploadedAt).toLocaleString('ru-RU')}</td>
-              <td>
-                <span className={`dlp-badge dlp-${file.dlpStatus}`}>
-                  {file.dlpStatus === 'approved' ? 'Принят' : 'Отклонён'}
-                </span>
-              </td>
-            </tr>
-          ))}
+          {data.map((file) => {
+            const extension = getFileExtension(file.name)
+            const typeColor = getFileTypeColor(extension)
+            return (
+              <tr key={file.id}>
+                <td><strong>{file.name}</strong></td>
+                <td>
+                  <span className={`type-badge type-${typeColor}`}>
+                    {extension}
+                  </span>
+                </td>
+                <td>{file.size}</td>
+                <td>{file.user}</td>
+                <td>{file.dialog}</td>
+                <td>{new Date(file.uploadedAt).toLocaleString('ru-RU')}</td>
+                <td>
+                  <span className={`dlp-badge dlp-${file.dlpStatus}`}>
+                    {file.dlpStatus === 'approved' ? 'Принят' : 'Отклонён'}
+                  </span>
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       )
     }
@@ -1068,14 +1156,8 @@ export default function AdminDashboard() {
       <>
         <header className="page-toolbar">
           <h1 className="page-heading">{currentManagement.title}</h1>
-          {data.length > 0 && (
-            <span className="page-toolbar-info">
-              {data.length} записей
-            </span>
-          )}
         </header>
         <div className="admin-content">
-          {renderBulkActionsBar()}
           <button
             type="button"
             className={`filters-toggle ${filtersOpen ? 'is-open' : ''}`}
@@ -1110,10 +1192,126 @@ export default function AdminDashboard() {
     )
   }
 
+  const renderModal = () => {
+    if (!modalState.isOpen) return null
+
+    const getModalTitle = () => {
+      switch (modalState.type) {
+        case 'limits': return 'Изменить лимиты'
+        case 'tools': return 'Доступ к инструментам'
+        case 'models': return 'Доступ к моделям'
+        default: return 'Настройки'
+      }
+    }
+
+    const getModalContent = () => {
+      switch (modalState.type) {
+        case 'limits':
+          return (
+            <div className="modal-form">
+              <label className="modal-field">
+                <span>Лимит сообщений в день</span>
+                <input type="number" placeholder="100" defaultValue="100" />
+              </label>
+              <label className="modal-field">
+                <span>Лимит токенов в день</span>
+                <input type="number" placeholder="50000" defaultValue="50000" />
+              </label>
+              <label className="modal-field">
+                <span>Стоимостной лимит ($)</span>
+                <input type="number" placeholder="10" defaultValue="10" step="0.01" />
+              </label>
+            </div>
+          )
+        case 'tools':
+          return (
+            <div className="modal-form">
+              <div className="modal-field">
+                <span>Доступные инструменты</span>
+                <div className="checkbox-list">
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>Web Search</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>Code Interpreter</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" />
+                    <span>Image Generation</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>Calculator</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )
+        case 'models':
+          return (
+            <div className="modal-form">
+              <div className="modal-field">
+                <span>Доступные модели</span>
+                <div className="checkbox-list">
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>GPT-4</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>GPT-3.5 Turbo</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" />
+                    <span>Claude 3</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" />
+                    <span>Gemini Pro</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )
+        default:
+          return null
+      }
+    }
+
+    return (
+      <div className="modal-overlay" onClick={closeModal}>
+        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2 className="modal-title">{getModalTitle()}</h2>
+            <button type="button" className="modal-close" onClick={closeModal}>
+              ×
+            </button>
+          </div>
+          <div className="modal-body">
+            <div className="modal-info">
+              Применить изменения для {selectedUsers.length} пользователей
+            </div>
+            {getModalContent()}
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="modal-button btn-secondary" onClick={closeModal}>
+              Отменить
+            </button>
+            <button type="button" className="modal-button btn-primary" onClick={() => handleModalSubmit({})}>
+              Применить
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="admin-shell">
       {navOpen && (
-        <div 
+        <div
           className="sidebar-overlay"
           onClick={() => setNavOpen(false)}
         />
@@ -1151,6 +1349,7 @@ export default function AdminDashboard() {
           renderManagementView()
         )}
       </main>
+      {renderModal()}
     </div>
   )
 }
