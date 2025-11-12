@@ -13,7 +13,16 @@ import {
   FileText,
   Image,
   Search,
-  Clock
+  Clock,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  CheckSquare,
+  Square,
+  UserX,
+  Settings,
+  Wrench,
+  Cpu
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar.jsx'
 import EmptyState from './components/EmptyState.jsx'
@@ -65,7 +74,8 @@ const DASHBOARD_MODES = {
 const MANAGEMENT_SECTIONS = {
   users: {
     title: 'Пользователи',
-    columns: ['Пользователь', 'Первая активность', 'Последняя активность', 'Диалоги', 'Сообщения', 'Вызовы инструментов', 'Загрузки', 'Tokens in/out', 'Стоимость $', '% отклонённых', '% лайков'],
+    columns: ['ФИО', 'Роль', 'Дата последней активности', 'Количество активных чатов', 'Количество сообщений', 'Потрачено денег'],
+    sortableColumns: ['fio', 'role', 'lastActivity', 'activeChats', 'messagesCount', 'moneySpent'],
     filters: [
       { id: 'period', label: 'Период', type: 'date-range', fromField: 'activityFrom', toField: 'activityTo' },
       { id: 'fio', label: 'Поиск по ФИО', type: 'text', placeholder: 'Введите ФИО' },
@@ -83,24 +93,39 @@ const MANAGEMENT_SECTIONS = {
   },
   dialogs: {
     title: 'Диалоги',
-    columns: ['Диалог', 'Пользователь', 'Старт', 'Сообщений', 'Инструменты', 'Файлы', 'Голос', 'Tokens in/out', 'Стоимость $', 'Ср. TTFT/TTLT', 'Причина завершения'],
+    columns: ['Номер диалога', 'Дата создания', 'Пользователь', 'Глубина', 'Последняя активность', 'Модели', 'Инструменты', 'Голосовой ввод', 'Количество файлов', 'Стоимость'],
+    sortableColumns: ['dialogNumber', 'createdAt', 'user', 'depth', 'lastActivity', 'models', 'tools', 'voiceInput', 'filesCount', 'cost'],
     filters: [
-      { id: 'period', label: 'Период', type: 'date-range', fromField: 'periodFrom', toField: 'periodTo' }
+      { id: 'period', label: 'Период', type: 'date-range', fromField: 'periodFrom', toField: 'periodTo' },
+      { id: 'user', label: 'Поиск по пользователю', type: 'text', placeholder: 'Введите имя пользователя' }
     ]
   },
   files: {
     title: 'Файлы',
-    columns: ['Имя', 'Тип', 'Размер (MB)', 'Загружен', 'Пользователь', 'Диалог', 'DLP отклонён', 'Причина', 'Назначение', 'Модель'],
+    columns: ['Название', 'Тип', 'Размер', 'Пользователь', 'Диалог', 'Дата загрузки', 'Статус DLP'],
+    sortableColumns: ['name', 'type', 'size', 'user', 'dialog', 'uploadedAt', 'dlpStatus'],
     filters: [
       { id: 'period', label: 'Период', type: 'date-range', fromField: 'periodFrom', toField: 'periodTo' },
       {
-        id: 'status',
-        label: 'Статус',
+        id: 'dlpStatus',
+        label: 'Статус DLP',
         type: 'select',
         options: [
           { value: 'all', label: 'Все' },
           { value: 'approved', label: 'Принят' },
           { value: 'rejected', label: 'Отклонён' }
+        ]
+      },
+      {
+        id: 'type',
+        label: 'Тип',
+        type: 'select',
+        options: [
+          { value: 'all', label: 'Все' },
+          { value: 'image', label: 'Изображение' },
+          { value: 'document', label: 'Документ' },
+          { value: 'video', label: 'Видео' },
+          { value: 'audio', label: 'Аудио' }
         ]
       }
     ]
@@ -142,14 +167,50 @@ const MANAGEMENT_SECTIONS = {
   }
 }
 
+// Моковые данные
+const MOCK_USERS = [
+  { id: 1, fio: 'Иванов Иван Иванович', role: 'admin', lastActivity: '2025-11-12T10:30:00', activeChats: 5, messagesCount: 342, moneySpent: 125.50 },
+  { id: 2, fio: 'Петрова Мария Сергеевна', role: 'user', lastActivity: '2025-11-11T15:22:00', activeChats: 3, messagesCount: 156, moneySpent: 45.20 },
+  { id: 3, fio: 'Сидоров Петр Александрович', role: 'user', lastActivity: '2025-11-10T09:15:00', activeChats: 7, messagesCount: 521, moneySpent: 189.75 },
+  { id: 4, fio: 'Козлова Анна Дмитриевна', role: 'user', lastActivity: '2025-11-12T14:45:00', activeChats: 2, messagesCount: 89, moneySpent: 28.90 },
+  { id: 5, fio: 'Морозов Алексей Викторович', role: 'admin', lastActivity: '2025-11-12T11:20:00', activeChats: 4, messagesCount: 267, moneySpent: 95.30 },
+  { id: 6, fio: 'Новикова Елена Павловна', role: 'user', lastActivity: '2025-11-09T16:30:00', activeChats: 1, messagesCount: 43, moneySpent: 15.60 },
+  { id: 7, fio: 'Волков Дмитрий Игоревич', role: 'user', lastActivity: '2025-11-12T08:55:00', activeChats: 6, messagesCount: 412, moneySpent: 152.40 },
+  { id: 8, fio: 'Соколова Ольга Николаевна', role: 'user', lastActivity: '2025-11-11T13:10:00', activeChats: 3, messagesCount: 198, moneySpent: 67.80 }
+]
+
+const MOCK_DIALOGS = [
+  { id: 1, dialogNumber: 'DLG-1001', createdAt: '2025-11-10T08:00:00', user: 'Иванов И.И.', depth: 15, lastActivity: '2025-11-12T10:30:00', models: 'GPT-4, Claude 3', tools: 'Web Search, Calculator', voiceInput: 'Да', filesCount: 3, cost: 12.45 },
+  { id: 2, dialogNumber: 'DLG-1002', createdAt: '2025-11-09T14:30:00', user: 'Петрова М.С.', depth: 8, lastActivity: '2025-11-11T15:22:00', models: 'GPT-3.5', tools: 'Image Generation', voiceInput: 'Нет', filesCount: 1, cost: 5.20 },
+  { id: 3, dialogNumber: 'DLG-1003', createdAt: '2025-11-11T09:15:00', user: 'Сидоров П.А.', depth: 23, lastActivity: '2025-11-12T11:45:00', models: 'GPT-4, Gemini Pro', tools: 'Code Interpreter, Web Search', voiceInput: 'Да', filesCount: 7, cost: 28.90 },
+  { id: 4, dialogNumber: 'DLG-1004', createdAt: '2025-11-08T16:20:00', user: 'Козлова А.Д.', depth: 5, lastActivity: '2025-11-12T14:45:00', models: 'Claude 3', tools: 'Нет', voiceInput: 'Нет', filesCount: 0, cost: 3.15 },
+  { id: 5, dialogNumber: 'DLG-1005', createdAt: '2025-11-12T07:00:00', user: 'Морозов А.В.', depth: 12, lastActivity: '2025-11-12T11:20:00', models: 'GPT-4', tools: 'Web Search, Calculator, Code Interpreter', voiceInput: 'Да', filesCount: 4, cost: 18.60 },
+  { id: 6, dialogNumber: 'DLG-1006', createdAt: '2025-11-07T11:45:00', user: 'Новикова Е.П.', depth: 3, lastActivity: '2025-11-09T16:30:00', models: 'GPT-3.5', tools: 'Image Generation', voiceInput: 'Нет', filesCount: 2, cost: 2.80 },
+  { id: 7, dialogNumber: 'DLG-1007', createdAt: '2025-11-11T13:30:00', user: 'Волков Д.И.', depth: 19, lastActivity: '2025-11-12T09:15:00', models: 'GPT-4, Claude 3, Gemini Pro', tools: 'Web Search, Code Interpreter', voiceInput: 'Да', filesCount: 5, cost: 22.75 },
+  { id: 8, dialogNumber: 'DLG-1008', createdAt: '2025-11-10T15:00:00', user: 'Соколова О.Н.', depth: 10, lastActivity: '2025-11-11T13:10:00', models: 'GPT-4', tools: 'Calculator', voiceInput: 'Нет', filesCount: 1, cost: 9.40 }
+]
+
+const MOCK_FILES = [
+  { id: 1, name: 'presentation.pdf', type: 'document', size: '2.5 MB', user: 'Иванов И.И.', dialog: 'DLG-1001', uploadedAt: '2025-11-10T08:15:00', dlpStatus: 'approved' },
+  { id: 2, name: 'chart.png', type: 'image', size: '1.2 MB', user: 'Петрова М.С.', dialog: 'DLG-1002', uploadedAt: '2025-11-09T14:45:00', dlpStatus: 'approved' },
+  { id: 3, name: 'data.xlsx', type: 'document', size: '3.8 MB', user: 'Сидоров П.А.', dialog: 'DLG-1003', uploadedAt: '2025-11-11T09:30:00', dlpStatus: 'approved' },
+  { id: 4, name: 'confidential.docx', type: 'document', size: '0.8 MB', user: 'Козлова А.Д.', dialog: 'DLG-1004', uploadedAt: '2025-11-08T16:25:00', dlpStatus: 'rejected' },
+  { id: 5, name: 'video_tutorial.mp4', type: 'video', size: '15.4 MB', user: 'Морозов А.В.', dialog: 'DLG-1005', uploadedAt: '2025-11-12T07:10:00', dlpStatus: 'approved' },
+  { id: 6, name: 'audio_note.mp3', type: 'audio', size: '4.2 MB', user: 'Новикова Е.П.', dialog: 'DLG-1006', uploadedAt: '2025-11-07T11:50:00', dlpStatus: 'approved' },
+  { id: 7, name: 'code_snippet.py', type: 'document', size: '0.1 MB', user: 'Волков Д.И.', dialog: 'DLG-1007', uploadedAt: '2025-11-11T13:45:00', dlpStatus: 'approved' },
+  { id: 8, name: 'screenshot.jpg', type: 'image', size: '2.1 MB', user: 'Соколова О.Н.', dialog: 'DLG-1008', uploadedAt: '2025-11-10T15:15:00', dlpStatus: 'approved' },
+  { id: 9, name: 'sensitive_data.csv', type: 'document', size: '5.6 MB', user: 'Иванов И.И.', dialog: 'DLG-1001', uploadedAt: '2025-11-10T09:00:00', dlpStatus: 'rejected' },
+  { id: 10, name: 'diagram.svg', type: 'image', size: '0.3 MB', user: 'Сидоров П.А.', dialog: 'DLG-1003', uploadedAt: '2025-11-11T10:20:00', dlpStatus: 'approved' }
+]
+
 const DASHBOARD_MODE_IDS = Object.keys(DASHBOARD_MODES)
 const DASHBOARD_FILTER_KEYS = ['from', 'to', 'model']
 
 const DEFAULT_FILTERS = {
   dashboards: { from: '', to: '', model: 'all' },
   users: { activityFrom: '', activityTo: '', fio: '', role: 'all' },
-  dialogs: { periodFrom: '', periodTo: '' },
-  files: { periodFrom: '', periodTo: '', status: 'all' },
+  dialogs: { periodFrom: '', periodTo: '', user: '' },
+  files: { periodFrom: '', periodTo: '', dlpStatus: 'all', type: 'all' },
   tools: { status: 'all', search: '' },
   models: { status: 'all', provider: '' }
 }
@@ -206,6 +267,9 @@ export default function AdminDashboard() {
   const [navOpen, setNavOpen] = useState(true)
   const [openDropdown, setOpenDropdown] = useState(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [sortConfig, setSortConfig] = useState({ column: null, direction: null })
+  const [selectedUsers, setSelectedUsers] = useState([])
+  const [showBulkActions, setShowBulkActions] = useState(false)
   const dropdownRefs = useRef({})
 
   const dashboardFilters = filters.dashboards || DEFAULT_FILTERS.dashboards
@@ -272,6 +336,170 @@ export default function AdminDashboard() {
     const next = exists ? list.filter((item) => item !== option) : [...list, option]
     updateFilter(sectionId, fieldId, next)
   }
+
+  // Функции для работы с данными
+  const getDataForSection = (sectionId) => {
+    if (sectionId === 'users') return MOCK_USERS
+    if (sectionId === 'dialogs') return MOCK_DIALOGS
+    if (sectionId === 'files') return MOCK_FILES
+    return []
+  }
+
+  const applyFilters = (data, sectionId) => {
+    const sectionFilters = filters[sectionId] || {}
+
+    return data.filter((item) => {
+      // Фильтр по периоду
+      if (sectionId === 'users') {
+        if (sectionFilters.activityFrom) {
+          const itemDate = new Date(item.lastActivity)
+          const fromDate = new Date(sectionFilters.activityFrom)
+          if (itemDate < fromDate) return false
+        }
+        if (sectionFilters.activityTo) {
+          const itemDate = new Date(item.lastActivity)
+          const toDate = new Date(sectionFilters.activityTo)
+          if (itemDate > toDate) return false
+        }
+        // Фильтр по ФИО
+        if (sectionFilters.fio && sectionFilters.fio.trim()) {
+          const searchTerm = sectionFilters.fio.toLowerCase()
+          if (!item.fio.toLowerCase().includes(searchTerm)) return false
+        }
+        // Фильтр по роли
+        if (sectionFilters.role && sectionFilters.role !== 'all') {
+          if (item.role !== sectionFilters.role) return false
+        }
+      }
+
+      if (sectionId === 'dialogs') {
+        if (sectionFilters.periodFrom) {
+          const itemDate = new Date(item.createdAt)
+          const fromDate = new Date(sectionFilters.periodFrom)
+          if (itemDate < fromDate) return false
+        }
+        if (sectionFilters.periodTo) {
+          const itemDate = new Date(item.createdAt)
+          const toDate = new Date(sectionFilters.periodTo)
+          if (itemDate > toDate) return false
+        }
+        // Фильтр по пользователю
+        if (sectionFilters.user && sectionFilters.user.trim()) {
+          const searchTerm = sectionFilters.user.toLowerCase()
+          if (!item.user.toLowerCase().includes(searchTerm)) return false
+        }
+      }
+
+      if (sectionId === 'files') {
+        if (sectionFilters.periodFrom) {
+          const itemDate = new Date(item.uploadedAt)
+          const fromDate = new Date(sectionFilters.periodFrom)
+          if (itemDate < fromDate) return false
+        }
+        if (sectionFilters.periodTo) {
+          const itemDate = new Date(item.uploadedAt)
+          const toDate = new Date(sectionFilters.periodTo)
+          if (itemDate > toDate) return false
+        }
+        // Фильтр по статусу DLP
+        if (sectionFilters.dlpStatus && sectionFilters.dlpStatus !== 'all') {
+          if (item.dlpStatus !== sectionFilters.dlpStatus) return false
+        }
+        // Фильтр по типу
+        if (sectionFilters.type && sectionFilters.type !== 'all') {
+          if (item.type !== sectionFilters.type) return false
+        }
+      }
+
+      return true
+    })
+  }
+
+  const applySorting = (data, sectionId) => {
+    if (!sortConfig.column || !sortConfig.direction) return data
+
+    const sorted = [...data].sort((a, b) => {
+      const aVal = a[sortConfig.column]
+      const bVal = b[sortConfig.column]
+
+      // Сортировка чисел
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal
+      }
+
+      // Сортировка дат
+      if (sortConfig.column.includes('Activity') || sortConfig.column.includes('At') || sortConfig.column.includes('createdAt') || sortConfig.column.includes('uploadedAt')) {
+        const dateA = new Date(aVal).getTime()
+        const dateB = new Date(bVal).getTime()
+        return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA
+      }
+
+      // Сортировка строк
+      const strA = String(aVal).toLowerCase()
+      const strB = String(bVal).toLowerCase()
+      if (strA < strB) return sortConfig.direction === 'asc' ? -1 : 1
+      if (strA > strB) return sortConfig.direction === 'asc' ? 1 : -1
+      return 0
+    })
+
+    return sorted
+  }
+
+  const getFilteredAndSortedData = (sectionId) => {
+    const rawData = getDataForSection(sectionId)
+    const filtered = applyFilters(rawData, sectionId)
+    const sorted = applySorting(filtered, sectionId)
+    return sorted
+  }
+
+  const handleSort = (columnIndex, columnKey) => {
+    if (!columnKey) return
+
+    setSortConfig((prev) => {
+      if (prev.column === columnKey) {
+        if (prev.direction === 'asc') return { column: columnKey, direction: 'desc' }
+        if (prev.direction === 'desc') return { column: null, direction: null }
+      }
+      return { column: columnKey, direction: 'asc' }
+    })
+  }
+
+  // Функции для работы с выбором пользователей
+  const toggleUserSelection = (userId) => {
+    setSelectedUsers((prev) => {
+      if (prev.includes(userId)) {
+        return prev.filter((id) => id !== userId)
+      }
+      return [...prev, userId]
+    })
+  }
+
+  const toggleSelectAll = () => {
+    const currentData = getFilteredAndSortedData('users')
+    const allIds = currentData.map((user) => user.id)
+
+    if (selectedUsers.length === allIds.length) {
+      setSelectedUsers([])
+    } else {
+      setSelectedUsers(allIds)
+    }
+  }
+
+  const handleBulkAction = (action) => {
+    console.log(`Bulk action: ${action} for users:`, selectedUsers)
+    // Здесь будет логика для массовых действий
+    alert(`Действие "${action}" применено к ${selectedUsers.length} пользователям`)
+  }
+
+  useEffect(() => {
+    setShowBulkActions(selectedUsers.length > 0)
+  }, [selectedUsers])
+
+  useEffect(() => {
+    // Сбрасываем выбор при смене секции
+    setSelectedUsers([])
+    setSortConfig({ column: null, direction: null })
+  }, [section])
 
   const activeSeries = useMemo(() => {
     if (!currentDashboardMode) return []
@@ -595,6 +823,233 @@ export default function AdminDashboard() {
     )
   }
 
+  const renderTableHeader = () => {
+    if (!currentManagement) return null
+
+    const isUsers = section === 'users'
+    const sortableColumns = currentManagement.sortableColumns || []
+
+    return (
+      <thead>
+        <tr>
+          {isUsers && (
+            <th style={{ width: '40px' }}>
+              <button
+                type="button"
+                className="checkbox-btn"
+                onClick={toggleSelectAll}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+              >
+                {selectedUsers.length > 0 && selectedUsers.length === getFilteredAndSortedData('users').length ? (
+                  <CheckSquare size={18} />
+                ) : (
+                  <Square size={18} />
+                )}
+              </button>
+            </th>
+          )}
+          {currentManagement.columns.map((column, index) => {
+            const columnKey = sortableColumns[index]
+            const isSortable = !!columnKey
+            const isSorted = sortConfig.column === columnKey
+
+            return (
+              <th key={column}>
+                {isSortable ? (
+                  <button
+                    type="button"
+                    className="sort-header"
+                    onClick={() => handleSort(index, columnKey)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: 0,
+                      font: 'inherit',
+                      color: 'inherit'
+                    }}
+                  >
+                    <span>{column}</span>
+                    {isSorted ? (
+                      sortConfig.direction === 'asc' ? (
+                        <ArrowUp size={14} />
+                      ) : (
+                        <ArrowDown size={14} />
+                      )
+                    ) : (
+                      <ArrowUpDown size={14} style={{ opacity: 0.3 }} />
+                    )}
+                  </button>
+                ) : (
+                  column
+                )}
+              </th>
+            )
+          })}
+        </tr>
+      </thead>
+    )
+  }
+
+  const renderTableBody = () => {
+    const data = getFilteredAndSortedData(section)
+
+    if (data.length === 0) {
+      const colspan = currentManagement.columns.length + (section === 'users' ? 1 : 0)
+      return (
+        <tbody>
+          <tr>
+            <td colSpan={colspan} style={{ padding: 0, border: 'none' }}>
+              <EmptyState
+                title="Нет данных"
+                description="Попробуйте изменить фильтры или добавить данные"
+              />
+            </td>
+          </tr>
+        </tbody>
+      )
+    }
+
+    if (section === 'users') {
+      return (
+        <tbody>
+          {data.map((user) => (
+            <tr key={user.id}>
+              <td>
+                <button
+                  type="button"
+                  className="checkbox-btn"
+                  onClick={() => toggleUserSelection(user.id)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                >
+                  {selectedUsers.includes(user.id) ? (
+                    <CheckSquare size={18} />
+                  ) : (
+                    <Square size={18} />
+                  )}
+                </button>
+              </td>
+              <td>{user.fio}</td>
+              <td>
+                <span className={`role-badge role-${user.role}`}>
+                  {user.role === 'admin' ? 'Администратор' : 'Пользователь'}
+                </span>
+              </td>
+              <td>{new Date(user.lastActivity).toLocaleString('ru-RU')}</td>
+              <td>{user.activeChats}</td>
+              <td>{user.messagesCount}</td>
+              <td>${user.moneySpent.toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      )
+    }
+
+    if (section === 'dialogs') {
+      return (
+        <tbody>
+          {data.map((dialog) => (
+            <tr key={dialog.id}>
+              <td><strong>{dialog.dialogNumber}</strong></td>
+              <td>{new Date(dialog.createdAt).toLocaleString('ru-RU')}</td>
+              <td>{dialog.user}</td>
+              <td>{dialog.depth}</td>
+              <td>{new Date(dialog.lastActivity).toLocaleString('ru-RU')}</td>
+              <td><span className="text-small">{dialog.models}</span></td>
+              <td><span className="text-small">{dialog.tools}</span></td>
+              <td>
+                <span className={`badge ${dialog.voiceInput === 'Да' ? 'badge-success' : 'badge-neutral'}`}>
+                  {dialog.voiceInput}
+                </span>
+              </td>
+              <td>{dialog.filesCount}</td>
+              <td>${dialog.cost.toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      )
+    }
+
+    if (section === 'files') {
+      return (
+        <tbody>
+          {data.map((file) => (
+            <tr key={file.id}>
+              <td><strong>{file.name}</strong></td>
+              <td>
+                <span className={`type-badge type-${file.type}`}>
+                  {file.type === 'image' ? 'Изображение' :
+                   file.type === 'video' ? 'Видео' :
+                   file.type === 'audio' ? 'Аудио' : 'Документ'}
+                </span>
+              </td>
+              <td>{file.size}</td>
+              <td>{file.user}</td>
+              <td>{file.dialog}</td>
+              <td>{new Date(file.uploadedAt).toLocaleString('ru-RU')}</td>
+              <td>
+                <span className={`dlp-badge dlp-${file.dlpStatus}`}>
+                  {file.dlpStatus === 'approved' ? 'Принят' : 'Отклонён'}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      )
+    }
+
+    return <tbody></tbody>
+  }
+
+  const renderBulkActionsBar = () => {
+    if (!showBulkActions || section !== 'users') return null
+
+    return (
+      <div className="bulk-actions-bar">
+        <div className="bulk-actions-info">
+          <span>Выбрано: {selectedUsers.length}</span>
+        </div>
+        <div className="bulk-actions-buttons">
+          <button
+            type="button"
+            className="bulk-action-btn btn-danger"
+            onClick={() => handleBulkAction('disable')}
+          >
+            <UserX size={16} />
+            <span>Отключить</span>
+          </button>
+          <button
+            type="button"
+            className="bulk-action-btn btn-secondary"
+            onClick={() => handleBulkAction('limits')}
+          >
+            <Settings size={16} />
+            <span>Изменить лимиты</span>
+          </button>
+          <button
+            type="button"
+            className="bulk-action-btn btn-secondary"
+            onClick={() => handleBulkAction('tools')}
+          >
+            <Wrench size={16} />
+            <span>Доступ к инструментам</span>
+          </button>
+          <button
+            type="button"
+            className="bulk-action-btn btn-secondary"
+            onClick={() => handleBulkAction('models')}
+          >
+            <Cpu size={16} />
+            <span>Доступ к моделям</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   const renderManagementView = () => {
     if (!currentManagement) return null
 
@@ -607,12 +1062,20 @@ export default function AdminDashboard() {
       return count
     }, 0)
 
+    const data = getFilteredAndSortedData(section)
+
     return (
       <>
         <header className="page-toolbar">
           <h1 className="page-heading">{currentManagement.title}</h1>
+          {data.length > 0 && (
+            <span className="page-toolbar-info">
+              {data.length} записей
+            </span>
+          )}
         </header>
         <div className="admin-content">
+          {renderBulkActionsBar()}
           <button
             type="button"
             className={`filters-toggle ${filtersOpen ? 'is-open' : ''}`}
@@ -636,23 +1099,8 @@ export default function AdminDashboard() {
             <div className="card-body">
               <div className="table-scroll">
                 <table className="data-table">
-                  <thead>
-                    <tr>
-                      {currentManagement.columns.map((column) => (
-                        <th key={column}>{column}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td colSpan={currentManagement.columns.length} style={{ padding: 0, border: 'none' }}>
-                        <EmptyState
-                          title="Нет данных"
-                          description="Подключите источник данных для отображения информации"
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
+                  {renderTableHeader()}
+                  {renderTableBody()}
                 </table>
               </div>
             </div>
