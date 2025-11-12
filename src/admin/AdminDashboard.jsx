@@ -29,45 +29,36 @@ import EmptyState from './components/EmptyState.jsx'
 import DateRangePicker from './components/DateRangePicker.jsx'
 import './Admin.css'
 
-const MODEL_OPTIONS = [
-  { value: 'all', label: 'Все модели' },
-  { value: 'gpt-4', label: 'GPT-4' },
-  { value: 'gpt-3.5', label: 'GPT-3.5 Turbo' },
-  { value: 'claude-3', label: 'Claude 3' },
-  { value: 'gemini', label: 'Gemini Pro' }
-]
-
 const DASHBOARD_MODES = {
   activity: {
     id: 'activity',
     title: 'Активность',
-    defaultSeries: ['dau', 'dialogs', 'messages'],
+    defaultSeries: ['activeUsers', 'newUsers', 'activeChats'],
     series: [
-      { id: 'dau', label: 'DAU' },
-      { id: 'dialogs', label: 'Новые диалоги' },
-      { id: 'messages', label: 'Сообщения' }
+      { id: 'activeUsers', label: 'Активные пользователи' },
+      { id: 'newUsers', label: 'Новые пользователи' },
+      { id: 'activeChats', label: 'Активные чаты' }
     ],
     kpis: [
-      { id: 'dau', label: 'DAU', icon: Users, trend: 'up', trendValue: '+12%' },
-      { id: 'newUsers', label: 'Новые пользователи', icon: TrendingUp, trend: 'up', trendValue: '+8%' },
-      { id: 'newDialogs', label: 'Новые диалоги', icon: MessageSquare, trend: 'up', trendValue: '+15%' },
-      { id: 'stickiness', label: 'Приверженность', icon: Target, trend: 'neutral', trendValue: '45%' }
+      { id: 'totalActiveUsers', label: 'Активных пользователей за период', icon: Users, trend: 'neutral', trendValue: '—' },
+      { id: 'avgDau', label: 'Средний DAU', icon: Activity, trend: 'neutral', trendValue: '—' },
+      { id: 'totalNewUsers', label: 'Новых пользователей', icon: TrendingUp, trend: 'neutral', trendValue: '—' },
+      { id: 'totalNewChats', label: 'Новых чатов', icon: MessageSquare, trend: 'neutral', trendValue: '—' }
     ]
   },
   cost: {
     id: 'cost',
     title: 'Стоимость',
-    defaultSeries: ['cost', 'tokensIn', 'tokensOut'],
+    defaultSeries: ['costByModels', 'totalTokens'],
     series: [
-      { id: 'cost', label: 'Стоимость' },
-      { id: 'tokensIn', label: 'Tokens in' },
-      { id: 'tokensOut', label: 'Tokens out' }
+      { id: 'costByModels', label: 'Стоимость по моделям' },
+      { id: 'totalTokens', label: 'Количество токенов' }
     ],
     kpis: [
-      { id: 'totalCost', label: 'Общая стоимость', icon: DollarSign, trend: 'up', trendValue: '$2.4K' },
-      { id: 'costPerActive', label: 'Стоимость/активный', icon: Users, trend: 'down', trendValue: '$0.85' },
-      { id: 'tokensIn', label: 'Tokens in', icon: TrendingUp, trend: 'up', trendValue: '12.5M' },
-      { id: 'tokensOut', label: 'Tokens out', icon: TrendingDown, trend: 'up', trendValue: '8.2M' }
+      { id: 'totalTokensSpent', label: 'Всего потрачено токенов', icon: Zap, trend: 'neutral', trendValue: '—' },
+      { id: 'totalMoneySpent', label: 'Всего потрачено денег', icon: DollarSign, trend: 'neutral', trendValue: '—' },
+      { id: 'avgCostPerUser', label: 'Средняя стоимость на пользователя', icon: Users, trend: 'neutral', trendValue: '—' },
+      { id: 'totalMessages', label: 'Отправлено сообщений', icon: MessageSquare, trend: 'neutral', trendValue: '—' }
     ]
   }
 }
@@ -211,10 +202,10 @@ const MOCK_FILES = [
 ]
 
 const DASHBOARD_MODE_IDS = Object.keys(DASHBOARD_MODES)
-const DASHBOARD_FILTER_KEYS = ['from', 'to', 'model']
+const DASHBOARD_FILTER_KEYS = ['from', 'to']
 
 const DEFAULT_FILTERS = {
-  dashboards: { from: '', to: '', model: 'all' },
+  dashboards: { from: '', to: '' },
   users: { activityFrom: '', activityTo: '', fio: '', role: 'all' },
   dialogs: { periodFrom: '', periodTo: '', user: '' },
   files: { periodFrom: '', periodTo: '', dlpStatus: 'all', type: 'all' },
@@ -752,13 +743,6 @@ export default function AdminDashboard() {
             placeholder="Выберите период"
           />
         </div>
-        {renderSelectDropdown({
-          sectionId: 'dashboards',
-          filter: { id: 'model', label: 'Модель', options: MODEL_OPTIONS },
-          value: dashboardFilters.model,
-          onChange: (nextValue) => updateFilter('dashboards', 'model', nextValue),
-          scope: 'dashboard'
-        })}
       </div>
     )
   }
