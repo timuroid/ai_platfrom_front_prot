@@ -201,6 +201,90 @@ const MOCK_FILES = [
   { id: 10, name: 'diagram.svg', type: 'image', size: '0.3 MB', user: 'Сидоров П.А.', dialog: 'DLG-1003', uploadedAt: '2025-11-11T10:20:00', dlpStatus: 'approved' }
 ]
 
+// Моковые данные для графика "Активность" (30 дней)
+const MOCK_ACTIVITY_DATA = [
+  { date: '2025-10-13', activeUsers: 45, newUsers: 8, activeChats: 67 },
+  { date: '2025-10-14', activeUsers: 52, newUsers: 12, activeChats: 73 },
+  { date: '2025-10-15', activeUsers: 48, newUsers: 6, activeChats: 71 },
+  { date: '2025-10-16', activeUsers: 61, newUsers: 15, activeChats: 89 },
+  { date: '2025-10-17', activeUsers: 58, newUsers: 9, activeChats: 82 },
+  { date: '2025-10-18', activeUsers: 43, newUsers: 7, activeChats: 65 },
+  { date: '2025-10-19', activeUsers: 39, newUsers: 5, activeChats: 58 },
+  { date: '2025-10-20', activeUsers: 55, newUsers: 11, activeChats: 78 },
+  { date: '2025-10-21', activeUsers: 63, newUsers: 13, activeChats: 91 },
+  { date: '2025-10-22', activeUsers: 59, newUsers: 10, activeChats: 85 },
+  { date: '2025-10-23', activeUsers: 67, newUsers: 14, activeChats: 96 },
+  { date: '2025-10-24', activeUsers: 71, newUsers: 18, activeChats: 102 },
+  { date: '2025-10-25', activeUsers: 54, newUsers: 8, activeChats: 79 },
+  { date: '2025-10-26', activeUsers: 49, newUsers: 6, activeChats: 72 },
+  { date: '2025-10-27', activeUsers: 64, newUsers: 16, activeChats: 93 },
+  { date: '2025-10-28', activeUsers: 69, newUsers: 12, activeChats: 98 },
+  { date: '2025-10-29', activeUsers: 73, newUsers: 15, activeChats: 105 },
+  { date: '2025-10-30', activeUsers: 76, newUsers: 19, activeChats: 110 },
+  { date: '2025-10-31', activeUsers: 81, newUsers: 21, activeChats: 118 },
+  { date: '2025-11-01', activeUsers: 78, newUsers: 17, activeChats: 112 },
+  { date: '2025-11-02', activeUsers: 62, newUsers: 9, activeChats: 88 },
+  { date: '2025-11-03', activeUsers: 57, newUsers: 7, activeChats: 81 },
+  { date: '2025-11-04', activeUsers: 72, newUsers: 14, activeChats: 101 },
+  { date: '2025-11-05', activeUsers: 85, newUsers: 22, activeChats: 124 },
+  { date: '2025-11-06', activeUsers: 88, newUsers: 20, activeChats: 128 },
+  { date: '2025-11-07', activeUsers: 82, newUsers: 16, activeChats: 119 },
+  { date: '2025-11-08', activeUsers: 79, newUsers: 13, activeChats: 114 },
+  { date: '2025-11-09', activeUsers: 74, newUsers: 11, activeChats: 107 },
+  { date: '2025-11-10', activeUsers: 91, newUsers: 25, activeChats: 135 },
+  { date: '2025-11-11', activeUsers: 94, newUsers: 23, activeChats: 138 }
+]
+
+// Моковые данные для графика "Стоимость" (30 дней)
+const MOCK_COST_DATA = [
+  { date: '2025-10-13', gpt4: 45.2, gpt35: 12.5, claude3: 28.3, gemini: 15.7, tokens: 1250000 },
+  { date: '2025-10-14', gpt4: 52.8, gpt35: 15.2, claude3: 31.5, gemini: 18.2, tokens: 1420000 },
+  { date: '2025-10-15', gpt4: 48.3, gpt35: 13.8, claude3: 29.1, gemini: 16.5, tokens: 1320000 },
+  { date: '2025-10-16', gpt4: 61.5, gpt35: 18.3, claude3: 35.8, gemini: 21.4, tokens: 1680000 },
+  { date: '2025-10-17', gpt4: 58.2, gpt35: 16.7, claude3: 33.2, gemini: 19.8, tokens: 1580000 },
+  { date: '2025-10-18', gpt4: 43.7, gpt35: 12.1, claude3: 26.5, gemini: 14.9, tokens: 1180000 },
+  { date: '2025-10-19', gpt4: 39.5, gpt35: 10.8, claude3: 23.7, gemini: 13.2, tokens: 1050000 },
+  { date: '2025-10-20', gpt4: 55.3, gpt35: 15.9, claude3: 31.8, gemini: 18.7, tokens: 1450000 },
+  { date: '2025-10-21', gpt4: 63.7, gpt35: 18.5, claude3: 36.2, gemini: 21.9, tokens: 1720000 },
+  { date: '2025-10-22', gpt4: 59.8, gpt35: 17.2, claude3: 34.1, gemini: 20.3, tokens: 1620000 },
+  { date: '2025-10-23', gpt4: 67.2, gpt35: 19.4, claude3: 38.5, gemini: 23.1, tokens: 1820000 },
+  { date: '2025-10-24', gpt4: 71.5, gpt35: 20.8, claude3: 41.2, gemini: 24.8, tokens: 1950000 },
+  { date: '2025-10-25', gpt4: 54.8, gpt35: 15.6, claude3: 31.2, gemini: 18.4, tokens: 1430000 },
+  { date: '2025-10-26', gpt4: 49.3, gpt35: 14.1, claude3: 28.5, gemini: 16.8, tokens: 1290000 },
+  { date: '2025-10-27', gpt4: 64.2, gpt35: 18.7, claude3: 36.8, gemini: 22.1, tokens: 1740000 },
+  { date: '2025-10-28', gpt4: 69.5, gpt35: 20.1, claude3: 39.8, gemini: 23.9, tokens: 1880000 },
+  { date: '2025-10-29', gpt4: 73.8, gpt35: 21.3, claude3: 42.5, gemini: 25.6, tokens: 2010000 },
+  { date: '2025-10-30', gpt4: 76.2, gpt35: 22.1, claude3: 43.8, gemini: 26.5, tokens: 2080000 },
+  { date: '2025-10-31', gpt4: 81.7, gpt35: 23.8, claude3: 47.2, gemini: 28.7, tokens: 2240000 },
+  { date: '2025-11-01', gpt4: 78.5, gpt35: 22.7, claude3: 45.1, gemini: 27.3, tokens: 2140000 },
+  { date: '2025-11-02', gpt4: 62.3, gpt35: 17.9, claude3: 35.6, gemini: 21.2, tokens: 1690000 },
+  { date: '2025-11-03', gpt4: 57.8, gpt35: 16.5, claude3: 33.1, gemini: 19.6, tokens: 1570000 },
+  { date: '2025-11-04', gpt4: 72.3, gpt35: 20.9, claude3: 41.5, gemini: 25.1, tokens: 1970000 },
+  { date: '2025-11-05', gpt4: 85.7, gpt35: 24.8, claude3: 49.3, gemini: 29.8, tokens: 2340000 },
+  { date: '2025-11-06', gpt4: 88.2, gpt35: 25.6, claude3: 50.8, gemini: 30.7, tokens: 2410000 },
+  { date: '2025-11-07', gpt4: 82.5, gpt35: 23.9, claude3: 47.5, gemini: 28.9, tokens: 2260000 },
+  { date: '2025-11-08', gpt4: 79.3, gpt35: 22.9, claude3: 45.6, gemini: 27.6, tokens: 2170000 },
+  { date: '2025-11-09', gpt4: 74.8, gpt35: 21.6, claude3: 42.9, gemini: 26.1, tokens: 2040000 },
+  { date: '2025-11-10', gpt4: 91.5, gpt35: 26.5, claude3: 52.7, gemini: 32.1, tokens: 2500000 },
+  { date: '2025-11-11', gpt4: 94.2, gpt35: 27.3, claude3: 54.3, gemini: 33.2, tokens: 2580000 }
+]
+
+// Моковые метрики для дашборда "Активность"
+const MOCK_ACTIVITY_METRICS = {
+  totalActiveUsers: { value: 412, trend: 'up', trendValue: '+18%' },
+  avgDau: { value: 68, trend: 'up', trendValue: '+12%' },
+  totalNewUsers: { value: 428, trend: 'up', trendValue: '+24%' },
+  totalNewChats: { value: 2847, trend: 'up', trendValue: '+15%' }
+}
+
+// Моковые метрики для дашборда "Стоимость"
+const MOCK_COST_METRICS = {
+  totalTokensSpent: { value: '52.4M', trend: 'up', trendValue: '+16%' },
+  totalMoneySpent: { value: '$1,985.30', trend: 'up', trendValue: '+14%' },
+  avgCostPerUser: { value: '$4.82', trend: 'down', trendValue: '-8%' },
+  totalMessages: { value: 8245, trend: 'up', trendValue: '+21%' }
+}
+
 const DASHBOARD_MODE_IDS = Object.keys(DASHBOARD_MODES)
 const DASHBOARD_FILTER_KEYS = ['from', 'to']
 
@@ -689,12 +773,18 @@ export default function AdminDashboard() {
 
   const renderKpis = () => {
     if (!currentDashboardMode) return null
+
+    // Получаем моковые метрики в зависимости от режима дашборда
+    const metrics = dashboardMode === 'activity' ? MOCK_ACTIVITY_METRICS : MOCK_COST_METRICS
+
     return (
       <section className="kpi-grid">
         {currentDashboardMode.kpis.map((kpi) => {
           const Icon = kpi.icon
-          const trendClass = `kpi-trend kpi-trend-${kpi.trend}`
-          const TrendIcon = kpi.trend === 'up' ? TrendingUp : kpi.trend === 'down' ? TrendingDown : null
+          const metricData = metrics[kpi.id] || {}
+          const trend = metricData.trend || 'neutral'
+          const trendClass = `kpi-trend kpi-trend-${trend}`
+          const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : null
 
           return (
             <div className="kpi-card" key={kpi.id}>
@@ -705,10 +795,11 @@ export default function AdminDashboard() {
                 <span className="kpi-label">{kpi.label}</span>
               </div>
               <div className="kpi-body">
-                <span className="kpi-value">{kpi.trendValue || '—'}</span>
+                <span className="kpi-value">{metricData.value || '—'}</span>
                 {TrendIcon && (
                   <span className={trendClass}>
                     <TrendIcon size={16} strokeWidth={2.5} />
+                    <span style={{ fontSize: '0.75rem', marginLeft: '4px' }}>{metricData.trendValue}</span>
                   </span>
                 )}
               </div>
@@ -747,6 +838,336 @@ export default function AdminDashboard() {
     )
   }
 
+  const renderChart = () => {
+    if (dashboardMode === 'activity') {
+      // График активности - линейный график
+      const data = MOCK_ACTIVITY_DATA
+      const chartWidth = 800
+      const chartHeight = 300
+      const padding = { top: 20, right: 20, bottom: 40, left: 50 }
+      const innerWidth = chartWidth - padding.left - padding.right
+      const innerHeight = chartHeight - padding.top - padding.bottom
+
+      // Находим максимальные значения для масштабирования
+      const maxActiveUsers = Math.max(...data.map(d => d.activeUsers))
+      const maxNewUsers = Math.max(...data.map(d => d.newUsers))
+      const maxActiveChats = Math.max(...data.map(d => d.activeChats))
+      const maxValue = Math.max(maxActiveUsers, maxNewUsers, maxActiveChats) * 1.1
+
+      // Создаем точки для линий
+      const createLine = (dataKey) => {
+        return data.map((d, i) => {
+          const x = padding.left + (i / (data.length - 1)) * innerWidth
+          const y = padding.top + innerHeight - (d[dataKey] / maxValue) * innerHeight
+          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
+        }).join(' ')
+      }
+
+      const colors = {
+        activeUsers: '#f97316',
+        newUsers: '#3b82f6',
+        activeChats: '#10b981'
+      }
+
+      return (
+        <>
+          <div style={{ width: '100%', overflowX: 'auto' }}>
+            <svg width={chartWidth} height={chartHeight} style={{ minWidth: '600px' }}>
+              {/* Горизонтальные линии сетки */}
+              {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
+                <g key={i}>
+                  <line
+                    x1={padding.left}
+                    y1={padding.top + innerHeight * (1 - ratio)}
+                    x2={padding.left + innerWidth}
+                    y2={padding.top + innerHeight * (1 - ratio)}
+                    stroke="var(--border-default)"
+                    strokeDasharray="4 4"
+                    opacity="0.3"
+                  />
+                  <text
+                    x={padding.left - 10}
+                    y={padding.top + innerHeight * (1 - ratio) + 5}
+                    textAnchor="end"
+                    fontSize="12"
+                    fill="var(--text-secondary)"
+                  >
+                    {Math.round(maxValue * ratio)}
+                  </text>
+                </g>
+              ))}
+
+              {/* Линии графика */}
+              {activeSeries.includes('activeUsers') && (
+                <path
+                  d={createLine('activeUsers')}
+                  fill="none"
+                  stroke={colors.activeUsers}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+              {activeSeries.includes('newUsers') && (
+                <path
+                  d={createLine('newUsers')}
+                  fill="none"
+                  stroke={colors.newUsers}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+              {activeSeries.includes('activeChats') && (
+                <path
+                  d={createLine('activeChats')}
+                  fill="none"
+                  stroke={colors.activeChats}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+
+              {/* Подписи дат (каждая 5-я) */}
+              {data.filter((_, i) => i % 5 === 0).map((d, i) => {
+                const originalIndex = i * 5
+                const x = padding.left + (originalIndex / (data.length - 1)) * innerWidth
+                return (
+                  <text
+                    key={originalIndex}
+                    x={x}
+                    y={chartHeight - 10}
+                    textAnchor="middle"
+                    fontSize="11"
+                    fill="var(--text-secondary)"
+                  >
+                    {new Date(d.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}
+                  </text>
+                )
+              })}
+            </svg>
+          </div>
+          <div className="chart-legend">
+            <div className="chart-legend-item">
+              <div className="chart-legend-color" style={{ backgroundColor: colors.activeUsers }} />
+              <span>Активные пользователи</span>
+            </div>
+            <div className="chart-legend-item">
+              <div className="chart-legend-color" style={{ backgroundColor: colors.newUsers }} />
+              <span>Новые пользователи</span>
+            </div>
+            <div className="chart-legend-item">
+              <div className="chart-legend-color" style={{ backgroundColor: colors.activeChats }} />
+              <span>Активные чаты</span>
+            </div>
+          </div>
+        </>
+      )
+    } else if (dashboardMode === 'cost') {
+      // График стоимости - столбчатый график с наложением
+      const data = MOCK_COST_DATA
+      const chartWidth = 800
+      const chartHeight = 300
+      const padding = { top: 20, right: 60, bottom: 40, left: 50 }
+      const innerWidth = chartWidth - padding.left - padding.right
+      const innerHeight = chartHeight - padding.top - padding.bottom
+      const barWidth = innerWidth / data.length - 2
+
+      // Находим максимальные значения
+      const maxCost = Math.max(...data.map(d => d.gpt4 + d.gpt35 + d.claude3 + d.gemini)) * 1.1
+      const maxTokens = Math.max(...data.map(d => d.tokens)) * 1.1
+
+      const colors = {
+        gpt4: '#f97316',
+        gpt35: '#3b82f6',
+        claude3: '#8b5cf6',
+        gemini: '#10b981',
+        tokens: '#ef4444'
+      }
+
+      return (
+        <div style={{ width: '100%', overflowX: 'auto' }}>
+          <svg width={chartWidth} height={chartHeight} style={{ minWidth: '600px' }}>
+            {/* Горизонтальные линии сетки для стоимости */}
+            {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
+              <g key={i}>
+                <line
+                  x1={padding.left}
+                  y1={padding.top + innerHeight * (1 - ratio)}
+                  x2={padding.left + innerWidth}
+                  y2={padding.top + innerHeight * (1 - ratio)}
+                  stroke="var(--border-default)"
+                  strokeDasharray="4 4"
+                  opacity="0.3"
+                />
+                <text
+                  x={padding.left - 10}
+                  y={padding.top + innerHeight * (1 - ratio) + 5}
+                  textAnchor="end"
+                  fontSize="12"
+                  fill="var(--text-secondary)"
+                >
+                  ${Math.round(maxCost * ratio)}
+                </text>
+              </g>
+            ))}
+
+            {/* Ось для токенов справа */}
+            {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
+              <text
+                key={`tokens-${i}`}
+                x={chartWidth - padding.right + 45}
+                y={padding.top + innerHeight * (1 - ratio) + 5}
+                textAnchor="start"
+                fontSize="11"
+                fill={colors.tokens}
+              >
+                {(maxTokens * ratio / 1000000).toFixed(1)}M
+              </text>
+            ))}
+
+            {/* Столбцы */}
+            {data.map((d, i) => {
+              const x = padding.left + (i / data.length) * innerWidth
+              const total = d.gpt4 + d.gpt35 + d.claude3 + d.gemini
+              let currentY = padding.top + innerHeight
+
+              return (
+                <g key={i}>
+                  {/* GPT-4 */}
+                  {activeSeries.includes('costByModels') && (
+                    <>
+                      <rect
+                        x={x}
+                        y={currentY - (d.gpt4 / maxCost) * innerHeight}
+                        width={barWidth}
+                        height={(d.gpt4 / maxCost) * innerHeight}
+                        fill={colors.gpt4}
+                        opacity="0.8"
+                      />
+                      {(() => {
+                        currentY -= (d.gpt4 / maxCost) * innerHeight
+                        return null
+                      })()}
+                      {/* GPT-3.5 */}
+                      <rect
+                        x={x}
+                        y={currentY - (d.gpt35 / maxCost) * innerHeight}
+                        width={barWidth}
+                        height={(d.gpt35 / maxCost) * innerHeight}
+                        fill={colors.gpt35}
+                        opacity="0.8"
+                      />
+                      {(() => {
+                        currentY -= (d.gpt35 / maxCost) * innerHeight
+                        return null
+                      })()}
+                      {/* Claude 3 */}
+                      <rect
+                        x={x}
+                        y={currentY - (d.claude3 / maxCost) * innerHeight}
+                        width={barWidth}
+                        height={(d.claude3 / maxCost) * innerHeight}
+                        fill={colors.claude3}
+                        opacity="0.8"
+                      />
+                      {(() => {
+                        currentY -= (d.claude3 / maxCost) * innerHeight
+                        return null
+                      })()}
+                      {/* Gemini */}
+                      <rect
+                        x={x}
+                        y={currentY - (d.gemini / maxCost) * innerHeight}
+                        width={barWidth}
+                        height={(d.gemini / maxCost) * innerHeight}
+                        fill={colors.gemini}
+                        opacity="0.8"
+                      />
+                    </>
+                  )}
+                </g>
+              )
+            })}
+
+            {/* Линия токенов */}
+            {activeSeries.includes('totalTokens') && (
+              <path
+                d={data.map((d, i) => {
+                  const x = padding.left + (i / data.length) * innerWidth + barWidth / 2
+                  const y = padding.top + innerHeight - (d.tokens / maxTokens) * innerHeight
+                  return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
+                }).join(' ')}
+                fill="none"
+                stroke={colors.tokens}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+
+            {/* Точки на линии токенов */}
+            {activeSeries.includes('totalTokens') && data.map((d, i) => {
+              const x = padding.left + (i / data.length) * innerWidth + barWidth / 2
+              const y = padding.top + innerHeight - (d.tokens / maxTokens) * innerHeight
+              return (
+                <circle
+                  key={`dot-${i}`}
+                  cx={x}
+                  cy={y}
+                  r="3"
+                  fill={colors.tokens}
+                />
+              )
+            })}
+
+            {/* Подписи дат (каждая 5-я) */}
+            {data.filter((_, i) => i % 5 === 0).map((d, i) => {
+              const originalIndex = i * 5
+              const x = padding.left + (originalIndex / data.length) * innerWidth + barWidth / 2
+              return (
+                <text
+                  key={originalIndex}
+                  x={x}
+                  y={chartHeight - 10}
+                  textAnchor="middle"
+                  fontSize="11"
+                  fill="var(--text-secondary)"
+                >
+                  {new Date(d.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}
+                </text>
+              )
+            })}
+          </svg>
+          <div className="chart-legend">
+            <div className="chart-legend-item">
+              <div className="chart-legend-color bar" style={{ backgroundColor: colors.gpt4 }} />
+              <span>GPT-4</span>
+            </div>
+            <div className="chart-legend-item">
+              <div className="chart-legend-color bar" style={{ backgroundColor: colors.gpt35 }} />
+              <span>GPT-3.5</span>
+            </div>
+            <div className="chart-legend-item">
+              <div className="chart-legend-color bar" style={{ backgroundColor: colors.claude3 }} />
+              <span>Claude 3</span>
+            </div>
+            <div className="chart-legend-item">
+              <div className="chart-legend-color bar" style={{ backgroundColor: colors.gemini }} />
+              <span>Gemini</span>
+            </div>
+            <div className="chart-legend-item">
+              <div className="chart-legend-color" style={{ backgroundColor: colors.tokens }} />
+              <span>Токены (млн)</span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
+
   const renderDashboardAnalytics = () => {
     if (!currentDashboardMode) return null
     return (
@@ -757,10 +1178,7 @@ export default function AdminDashboard() {
             {renderSeriesToggles()}
           </header>
           <div className="card-body">
-            <div className="chart-placeholder">
-              <p>Комбо-график (линия + столбцы + площадь)</p>
-              <p className="placeholder-note">Активные серии: {activeSeries.join(', ')}</p>
-            </div>
+            {renderChart()}
           </div>
         </section>
         {renderKpis()}
