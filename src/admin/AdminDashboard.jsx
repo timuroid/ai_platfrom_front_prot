@@ -353,7 +353,9 @@ export default function AdminDashboard() {
   const [selectedUsers, setSelectedUsers] = useState([])
   const [showBulkActions, setShowBulkActions] = useState(false)
   const [modalState, setModalState] = useState({ isOpen: false, type: null })
+  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, data: null })
   const dropdownRefs = useRef({})
+  const chartKey = useRef(0)
 
   const dashboardFilters = filters.dashboards || DEFAULT_FILTERS.dashboards
   const currentDashboardMode = DASHBOARD_MODES[dashboardMode]
@@ -631,6 +633,79 @@ export default function AdminDashboard() {
     setSortConfig({ column: null, direction: null })
   }, [section])
 
+  useEffect(() => {
+    // Обновляем ключ графика при изменении фильтров
+    chartKey.current += 1
+    setTooltip({ visible: false, x: 0, y: 0, data: null })
+  }, [dashboardFilters.from, dashboardFilters.to, dashboardMode])
+
+  // Функция для фильтрации данных по периоду
+  const getFilteredChartData = (data) => {
+    if (!dashboardFilters.from && !dashboardFilters.to) return data
+
+    return data.filter((item) => {
+      const itemDate = new Date(item.date)
+      if (dashboardFilters.from) {
+        const fromDate = new Date(dashboardFilters.from)
+        if (itemDate < fromDate) return false
+      }
+      if (dashboardFilters.to) {
+        const toDate = new Date(dashboardFilters.to)
+        if (itemDate > toDate) return false
+      }
+      return true
+    })
+  }
+
+  // Функция для расчета метрик активности на основе отфильтрованных данных
+  const calculateActivityMetrics = (data) => {
+    if (!data.length) {
+      return {
+        totalActiveUsers: { value: 0, trend: 'neutral', trendValue: '—' },
+        avgDau: { value: 0, trend: 'neutral', trendValue: '—' },
+        totalNewUsers: { value: 0, trend: 'neutral', trendValue: '—' },
+        totalNewChats: { value: 0, trend: 'neutral', trendValue: '—' }
+      }
+    }
+
+    // Подсчет уникальных активных пользователей (просто суммируем для демо)
+    const totalActiveUsers = Math.max(...data.map(d => d.activeUsers))
+    const avgDau = Math.round(data.reduce((sum, d) => sum + d.activeUsers, 0) / data.length)
+    const totalNewUsers = data.reduce((sum, d) => sum + d.newUsers, 0)
+    const totalNewChats = data.reduce((sum, d) => sum + d.activeChats, 0)
+
+    return {
+      totalActiveUsers: { value: totalActiveUsers, trend: 'up', trendValue: '+18%' },
+      avgDau: { value: avgDau, trend: 'up', trendValue: '+12%' },
+      totalNewUsers: { value: totalNewUsers, trend: 'up', trendValue: '+24%' },
+      totalNewChats: { value: totalNewChats, trend: 'up', trendValue: '+15%' }
+    }
+  }
+
+  // Функция для расчета метрик стоимости на основе отфильтрованных данных
+  const calculateCostMetrics = (data) => {
+    if (!data.length) {
+      return {
+        totalTokensSpent: { value: '0M', trend: 'neutral', trendValue: '—' },
+        totalMoneySpent: { value: '$0.00', trend: 'neutral', trendValue: '—' },
+        avgCostPerUser: { value: '$0.00', trend: 'neutral', trendValue: '—' },
+        totalMessages: { value: 0, trend: 'neutral', trendValue: '—' }
+      }
+    }
+
+    const totalTokens = data.reduce((sum, d) => sum + d.tokens, 0)
+    const totalMoney = data.reduce((sum, d) => sum + d.gpt4 + d.gpt35 + d.claude3 + d.gemini, 0)
+    const totalMessages = data.length * 275 // Примерное количество сообщений в день
+    const avgCostPerUser = totalMoney / 412 // Используем фиксированное количество пользователей
+
+    return {
+      totalTokensSpent: { value: `${(totalTokens / 1000000).toFixed(1)}M`, trend: 'up', trendValue: '+16%' },
+      totalMoneySpent: { value: `$${totalMoney.toFixed(2)}`, trend: 'up', trendValue: '+14%' },
+      avgCostPerUser: { value: `$${avgCostPerUser.toFixed(2)}`, trend: 'down', trendValue: '-8%' },
+      totalMessages: { value: totalMessages, trend: 'up', trendValue: '+21%' }
+    }
+  }
+
   const activeSeries = useMemo(() => {
     if (!currentDashboardMode) return []
     const saved = seriesState[dashboardMode]
@@ -774,8 +849,12 @@ export default function AdminDashboard() {
   const renderKpis = () => {
     if (!currentDashboardMode) return null
 
-    // Получаем моковые метрики в зависимости от режима дашборда
-    const metrics = dashboardMode === 'activity' ? MOCK_ACTIVITY_METRICS : MOCK_COST_METRICS
+    // Получаем отфильтрованные данные и рассчитываем метрики
+    const rawData = dashboardMode === 'activity' ? MOCK_ACTIVITY_DATA : MOCK_COST_DATA
+    const filteredData = getFilteredChartData(rawData)
+    const metrics = dashboardMode === 'activity'
+      ? calculateActivityMetrics(filteredData)
+      : calculateCostMetrics(filteredData)
 
     return (
       <section className="kpi-grid">
@@ -841,7 +920,15 @@ export default function AdminDashboard() {
   const renderChart = () => {
     if (dashboardMode === 'activity') {
       // График активности - линейный график
-      const data = MOCK_ACTIVITY_DATA
+      const data = getFilteredChartData(MOCK_ACTIVITY_DATA)
+      if (!data.length) {
+        return (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+            Нет данных для выбранного периода
+          </div>
+        )
+      }
+
       const chartWidth = 800
       const chartHeight = 300
       const padding = { top: 20, right: 20, bottom: 40, left: 50 }
@@ -869,10 +956,35 @@ export default function AdminDashboard() {
         activeChats: '#10b981'
       }
 
+      const handleMouseMove = (event, dataPoint, index) => {
+        const rect = event.currentTarget.getBoundingClientRect()
+        setTooltip({
+          visible: true,
+          x: event.clientX,
+          y: event.clientY,
+          data: {
+            date: dataPoint.date,
+            activeUsers: dataPoint.activeUsers,
+            newUsers: dataPoint.newUsers,
+            activeChats: dataPoint.activeChats
+          }
+        })
+      }
+
+      const handleMouseLeave = () => {
+        setTooltip({ visible: false, x: 0, y: 0, data: null })
+      }
+
       return (
         <>
-          <div style={{ width: '100%', overflowX: 'auto' }}>
-            <svg width={chartWidth} height={chartHeight} style={{ minWidth: '600px' }}>
+          <div className="chart-container" style={{ width: '100%', overflowX: 'auto' }}>
+            <svg
+              key={chartKey.current}
+              width={chartWidth}
+              height={chartHeight}
+              style={{ minWidth: '600px' }}
+              className="chart-svg"
+            >
               {/* Горизонтальные линии сетки */}
               {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
                 <g key={i}>
@@ -906,6 +1018,7 @@ export default function AdminDashboard() {
                   strokeWidth="3"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  className="chart-line"
                 />
               )}
               {activeSeries.includes('newUsers') && (
@@ -916,6 +1029,8 @@ export default function AdminDashboard() {
                   strokeWidth="3"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  className="chart-line"
+                  style={{ animationDelay: '0.2s' }}
                 />
               )}
               {activeSeries.includes('activeChats') && (
@@ -926,12 +1041,35 @@ export default function AdminDashboard() {
                   strokeWidth="3"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  className="chart-line"
+                  style={{ animationDelay: '0.4s' }}
                 />
               )}
 
-              {/* Подписи дат (каждая 5-я) */}
-              {data.filter((_, i) => i % 5 === 0).map((d, i) => {
-                const originalIndex = i * 5
+              {/* Интерактивные точки */}
+              {data.map((d, i) => {
+                const x = padding.left + (i / (data.length - 1)) * innerWidth
+                return (
+                  <rect
+                    key={i}
+                    x={x - 8}
+                    y={padding.top}
+                    width={16}
+                    height={innerHeight}
+                    fill="transparent"
+                    style={{ cursor: 'pointer' }}
+                    onMouseMove={(e) => handleMouseMove(e, d, i)}
+                    onMouseLeave={handleMouseLeave}
+                  />
+                )
+              })}
+
+              {/* Подписи дат */}
+              {data.filter((_, i) => {
+                const step = Math.max(1, Math.floor(data.length / 6))
+                return i % step === 0
+              }).map((d, i) => {
+                const originalIndex = i * Math.max(1, Math.floor(data.length / 6))
                 const x = padding.left + (originalIndex / (data.length - 1)) * innerWidth
                 return (
                   <text
@@ -966,7 +1104,15 @@ export default function AdminDashboard() {
       )
     } else if (dashboardMode === 'cost') {
       // График стоимости - столбчатый график с наложением
-      const data = MOCK_COST_DATA
+      const data = getFilteredChartData(MOCK_COST_DATA)
+      if (!data.length) {
+        return (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+            Нет данных для выбранного периода
+          </div>
+        )
+      }
+
       const chartWidth = 800
       const chartHeight = 300
       const padding = { top: 20, right: 60, bottom: 40, left: 50 }
@@ -986,9 +1132,36 @@ export default function AdminDashboard() {
         tokens: '#ef4444'
       }
 
+      const handleMouseMove = (event, dataPoint, index) => {
+        setTooltip({
+          visible: true,
+          x: event.clientX,
+          y: event.clientY,
+          data: {
+            date: dataPoint.date,
+            gpt4: dataPoint.gpt4,
+            gpt35: dataPoint.gpt35,
+            claude3: dataPoint.claude3,
+            gemini: dataPoint.gemini,
+            tokens: dataPoint.tokens,
+            total: dataPoint.gpt4 + dataPoint.gpt35 + dataPoint.claude3 + dataPoint.gemini
+          }
+        })
+      }
+
+      const handleMouseLeave = () => {
+        setTooltip({ visible: false, x: 0, y: 0, data: null })
+      }
+
       return (
-        <div style={{ width: '100%', overflowX: 'auto' }}>
-          <svg width={chartWidth} height={chartHeight} style={{ minWidth: '600px' }}>
+        <div className="chart-container" style={{ width: '100%', overflowX: 'auto' }}>
+          <svg
+            key={chartKey.current}
+            width={chartWidth}
+            height={chartHeight}
+            style={{ minWidth: '600px' }}
+            className="chart-svg"
+          >
             {/* Горизонтальные линии сетки для стоимости */}
             {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
               <g key={i}>
@@ -1045,6 +1218,8 @@ export default function AdminDashboard() {
                         height={(d.gpt4 / maxCost) * innerHeight}
                         fill={colors.gpt4}
                         opacity="0.8"
+                        className="chart-bar"
+                        style={{ animationDelay: `${i * 0.02}s` }}
                       />
                       {(() => {
                         currentY -= (d.gpt4 / maxCost) * innerHeight
@@ -1058,6 +1233,8 @@ export default function AdminDashboard() {
                         height={(d.gpt35 / maxCost) * innerHeight}
                         fill={colors.gpt35}
                         opacity="0.8"
+                        className="chart-bar"
+                        style={{ animationDelay: `${i * 0.02}s` }}
                       />
                       {(() => {
                         currentY -= (d.gpt35 / maxCost) * innerHeight
@@ -1071,6 +1248,8 @@ export default function AdminDashboard() {
                         height={(d.claude3 / maxCost) * innerHeight}
                         fill={colors.claude3}
                         opacity="0.8"
+                        className="chart-bar"
+                        style={{ animationDelay: `${i * 0.02}s` }}
                       />
                       {(() => {
                         currentY -= (d.claude3 / maxCost) * innerHeight
@@ -1084,9 +1263,22 @@ export default function AdminDashboard() {
                         height={(d.gemini / maxCost) * innerHeight}
                         fill={colors.gemini}
                         opacity="0.8"
+                        className="chart-bar"
+                        style={{ animationDelay: `${i * 0.02}s` }}
                       />
                     </>
                   )}
+                  {/* Интерактивная область для столбца */}
+                  <rect
+                    x={x}
+                    y={padding.top}
+                    width={barWidth}
+                    height={innerHeight}
+                    fill="transparent"
+                    style={{ cursor: 'pointer' }}
+                    onMouseMove={(e) => handleMouseMove(e, d, i)}
+                    onMouseLeave={handleMouseLeave}
+                  />
                 </g>
               )
             })}
@@ -1122,9 +1314,12 @@ export default function AdminDashboard() {
               )
             })}
 
-            {/* Подписи дат (каждая 5-я) */}
-            {data.filter((_, i) => i % 5 === 0).map((d, i) => {
-              const originalIndex = i * 5
+            {/* Подписи дат */}
+            {data.filter((_, i) => {
+              const step = Math.max(1, Math.floor(data.length / 6))
+              return i % step === 0
+            }).map((d, i) => {
+              const originalIndex = i * Math.max(1, Math.floor(data.length / 6))
               const x = padding.left + (originalIndex / data.length) * innerWidth + barWidth / 2
               return (
                 <text
@@ -1581,6 +1776,109 @@ export default function AdminDashboard() {
     )
   }
 
+  const renderTooltip = () => {
+    if (!tooltip.visible || !tooltip.data) return null
+
+    const formatDate = (dateStr) => {
+      return new Date(dateStr).toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      })
+    }
+
+    // Определяем, что отображать в зависимости от режима дашборда
+    if (dashboardMode === 'activity') {
+      return (
+        <div
+          className={`chart-tooltip ${tooltip.visible ? 'visible' : ''}`}
+          style={{
+            left: `${tooltip.x + 10}px`,
+            top: `${tooltip.y - 10}px`
+          }}
+        >
+          <div className="chart-tooltip-date">{formatDate(tooltip.data.date)}</div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#f97316' }} />
+              Активные пользователи
+            </span>
+            <span className="chart-tooltip-value">{tooltip.data.activeUsers}</span>
+          </div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#3b82f6' }} />
+              Новые пользователи
+            </span>
+            <span className="chart-tooltip-value">{tooltip.data.newUsers}</span>
+          </div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#10b981' }} />
+              Активные чаты
+            </span>
+            <span className="chart-tooltip-value">{tooltip.data.activeChats}</span>
+          </div>
+        </div>
+      )
+    } else if (dashboardMode === 'cost') {
+      return (
+        <div
+          className={`chart-tooltip ${tooltip.visible ? 'visible' : ''}`}
+          style={{
+            left: `${tooltip.x + 10}px`,
+            top: `${tooltip.y - 10}px`
+          }}
+        >
+          <div className="chart-tooltip-date">{formatDate(tooltip.data.date)}</div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#f97316' }} />
+              GPT-4
+            </span>
+            <span className="chart-tooltip-value">${tooltip.data.gpt4.toFixed(2)}</span>
+          </div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#3b82f6' }} />
+              GPT-3.5
+            </span>
+            <span className="chart-tooltip-value">${tooltip.data.gpt35.toFixed(2)}</span>
+          </div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#8b5cf6' }} />
+              Claude 3
+            </span>
+            <span className="chart-tooltip-value">${tooltip.data.claude3.toFixed(2)}</span>
+          </div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#10b981' }} />
+              Gemini
+            </span>
+            <span className="chart-tooltip-value">${tooltip.data.gemini.toFixed(2)}</span>
+          </div>
+          <div className="chart-tooltip-item" style={{ borderTop: '1px solid var(--border-default)', marginTop: '8px', paddingTop: '8px' }}>
+            <span className="chart-tooltip-label">
+              <strong>Всего</strong>
+            </span>
+            <span className="chart-tooltip-value"><strong>${tooltip.data.total.toFixed(2)}</strong></span>
+          </div>
+          <div className="chart-tooltip-item">
+            <span className="chart-tooltip-label">
+              <span className="chart-tooltip-dot" style={{ backgroundColor: '#ef4444' }} />
+              Токены
+            </span>
+            <span className="chart-tooltip-value">{(tooltip.data.tokens / 1000000).toFixed(2)}M</span>
+          </div>
+        </div>
+      )
+    }
+
+    return null
+  }
+
   const renderModal = () => {
     if (!modalState.isOpen) return null
 
@@ -1740,6 +2038,7 @@ export default function AdminDashboard() {
           renderManagementView()
         )}
       </main>
+      {renderTooltip()}
       {renderModal()}
     </div>
   )
