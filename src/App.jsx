@@ -655,67 +655,68 @@ export default function LLMChatInterface() {
       </button>
 
       <main className="app-main">
-        <section className="messages-area">
-          <div className="model-dock" role="region" aria-label="Выбор модели">
-            <div className="model-selector">
-              <button
-                type="button"
-                className={`model-button ${showModelDropdown ? 'is-open' : ''}`}
-                onClick={() => setShowModelDropdown((prev) => !prev)}
-              >
-                <span>{MODELS.find((model) => model.id === selectedModel)?.name}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M19 9l-7 7-7-7"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+        {showAllChats ? (
+          <AllChatsView
+            chats={chats}
+            onChatSelect={handleChatSelect}
+            onNewChat={createNewChat}
+            onDeleteChat={handleDeleteChat}
+          />
+        ) : (
+          <>
+            <section className="messages-area">
+              <div className="model-dock" role="region" aria-label="Выбор модели">
+                <div className="model-selector">
+                  <button
+                    type="button"
+                    className={`model-button ${showModelDropdown ? 'is-open' : ''}`}
+                    onClick={() => setShowModelDropdown((prev) => !prev)}
+                  >
+                    <span>{MODELS.find((model) => model.id === selectedModel)?.name}</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M19 9l-7 7-7-7"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
 
-              {showModelDropdown && (
-                <div className="model-dropdown">
-                  {MODELS.map((model) => (
-                    <button
-                      key={model.id}
-                      type="button"
-                      className={`model-option ${selectedModel === model.id ? 'is-active' : ''}`}
-                      onClick={() => {
-                        setSelectedModel(model.id);
-                        setShowModelDropdown(false);
-                      }}
-                    >
-                      {model.name}
-                    </button>
-                  ))}
+                  {showModelDropdown && (
+                    <div className="model-dropdown">
+                      {MODELS.map((model) => (
+                        <button
+                          key={model.id}
+                          type="button"
+                          className={`model-option ${selectedModel === model.id ? 'is-active' : ''}`}
+                          onClick={() => {
+                            setSelectedModel(model.id);
+                            setShowModelDropdown(false);
+                          }}
+                        >
+                          {model.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
 
-          <div className="messages-layout">
-            <div className="messages-column">
-              <div ref={messagesContainerRef} className="messages-viewport">
-                <div className="messages-scroll">
-                  <div className="messages-stack">
-                {showAllChats ? (
-              <AllChatsView
-                chats={chats}
-                onChatSelect={handleChatSelect}
-                onNewChat={createNewChat}
-                onDeleteChat={handleDeleteChat}
-              />
-            ) : messages.length === 0 ? (
-              <div className="welcome-screen">
-                <div className="welcome-header">
-                  <MessageSquare size={64} className="welcome-icon" />
-                  <h1 className="welcome-title">Добро пожаловать!</h1>
-                  <p className="welcome-subtitle">
-                    Я ваш AI-ассистент. Готов помочь с любыми вопросами и задачами.
-                  </p>
-                </div>
+              <div className="messages-layout">
+                <div className="messages-column">
+                  <div ref={messagesContainerRef} className="messages-viewport">
+                    <div className="messages-scroll">
+                      <div className="messages-stack">
+                        {messages.length === 0 ? (
+                          <div className="welcome-screen">
+                            <div className="welcome-header">
+                              <h1 className="welcome-title">Добро пожаловать!</h1>
+                              <p className="welcome-subtitle">
+                                Я ваш AI-ассистент. Готов помочь с любыми вопросами и задачами.
+                              </p>
+                            </div>
 
                 <div className="welcome-features">
                   <div className="feature-card">
@@ -1019,6 +1020,8 @@ export default function LLMChatInterface() {
             </div>
           </div>
         </div>
+          </>
+        )}
       </main>
 
       {showSettings && (
