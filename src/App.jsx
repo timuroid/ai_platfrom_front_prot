@@ -678,9 +678,86 @@ export default function LLMChatInterface() {
                 <div className="messages-scroll">
                   <div className="messages-stack">
                 {messages.length === 0 ? (
-              <div className="empty-state">
-                <MessageSquare size={48} />
-                <p>Привет! Чем могу помочь?</p>
+              <div className="welcome-screen">
+                <div className="welcome-header">
+                  <MessageSquare size={64} className="welcome-icon" />
+                  <h1 className="welcome-title">Добро пожаловать!</h1>
+                  <p className="welcome-subtitle">
+                    Я ваш AI-ассистент. Готов помочь с любыми вопросами и задачами.
+                  </p>
+                </div>
+
+                <div className="welcome-features">
+                  <div className="feature-card">
+                    <div className="feature-icon">
+                      <MessageSquare size={24} />
+                    </div>
+                    <h3 className="feature-title">Текстовые сообщения</h3>
+                    <p className="feature-description">
+                      Пишите вопросы и получайте развернутые ответы с примерами кода
+                    </p>
+                  </div>
+
+                  <div className="feature-card">
+                    <div className="feature-icon">
+                      <Mic size={24} />
+                    </div>
+                    <h3 className="feature-title">Голосовой ввод</h3>
+                    <p className="feature-description">
+                      Записывайте голосовые сообщения для быстрого общения
+                    </p>
+                  </div>
+
+                  <div className="feature-card">
+                    <div className="feature-icon">
+                      <Search size={24} />
+                    </div>
+                    <h3 className="feature-title">Веб-поиск</h3>
+                    <p className="feature-description">
+                      Используйте актуальные данные из интернета для точных ответов
+                    </p>
+                  </div>
+
+                  <div className="feature-card">
+                    <div className="feature-icon">
+                      <Image size={24} />
+                    </div>
+                    <h3 className="feature-title">Генерация изображений</h3>
+                    <p className="feature-description">
+                      Создавайте изображения по текстовому описанию
+                    </p>
+                  </div>
+                </div>
+
+                <div className="welcome-actions">
+                  <h3 className="actions-title">Быстрый старт</h3>
+                  <div className="quick-actions">
+                    <button
+                      type="button"
+                      className="quick-action-btn"
+                      onClick={() => setMessage('Расскажи о возможностях AI-ассистента')}
+                    >
+                      <MessageSquare size={18} />
+                      <span>Узнать больше о возможностях</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="quick-action-btn"
+                      onClick={() => window.open('https://docs.example.com/tutorials', '_blank')}
+                    >
+                      <FileText size={18} />
+                      <span>Образовательные материалы</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="quick-action-btn"
+                      onClick={() => setMessage('Как начать работу с AI-ассистентом?')}
+                    >
+                      <Settings size={18} />
+                      <span>Руководство по началу работы</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
               messages.map((msg) =>

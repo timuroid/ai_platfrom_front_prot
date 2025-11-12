@@ -10,7 +10,8 @@ import {
   Users,
   FileText,
   Wrench,
-  Cpu
+  Cpu,
+  List
 } from 'lucide-react'
 
 const SECTION_ICONS = {
@@ -75,6 +76,10 @@ export default function Sidebar({
     }
   };
 
+  const handleViewAllChats = () => {
+    window.location.hash = '/chats'
+  }
+
   const renderChatMode = () => (
     <>
       <div className="sidebar-action">
@@ -88,6 +93,20 @@ export default function Sidebar({
             <Plus size={20} />
           </span>
           <span className="sidebar-button-text">Новый чат</span>
+        </button>
+      </div>
+
+      <div className="sidebar-action sidebar-action-secondary">
+        <button
+          type="button"
+          className="sidebar-button sidebar-button-secondary"
+          onClick={handleViewAllChats}
+          title="Смотреть все чаты"
+        >
+          <span className="sidebar-button-icon">
+            <List size={20} />
+          </span>
+          <span className="sidebar-button-text">Смотреть все чаты</span>
         </button>
       </div>
 
