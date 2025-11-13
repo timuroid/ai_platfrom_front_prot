@@ -63,23 +63,26 @@ export default function AllChatsView({ chats, onChatSelect, onNewChat, onDeleteC
   return (
     <div className="all-chats-view">
       <div className="all-chats-view-header">
-        <h2 className="all-chats-view-title">Все чаты</h2>
+        <div className="all-chats-view-header-inner">
+          <h2 className="all-chats-view-title">Все чаты</h2>
 
-        <div className="all-chats-view-actions">
-          <div className="search-input-wrapper">
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Поиск по чатам..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="all-chats-view-actions">
+            <div className="search-input-wrapper">
+              <Search size={18} className="search-icon" />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Поиск по чатам..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       <div className="all-chats-view-content">
+        <div className="all-chats-view-content-inner">
         {filteredChats.length === 0 ? (
           <div className="empty-state">
             <MessageSquare size={64} />
@@ -145,6 +148,7 @@ export default function AllChatsView({ chats, onChatSelect, onNewChat, onDeleteC
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
