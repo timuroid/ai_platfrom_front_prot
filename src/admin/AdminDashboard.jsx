@@ -66,7 +66,7 @@ const DASHBOARD_MODES = {
 const MANAGEMENT_SECTIONS = {
   users: {
     title: 'Пользователи',
-    columns: ['ФИО', 'Роль', 'Дата последней активности', 'Количество активных чатов', 'Количество сообщений', 'Потрачено денег', 'Текущие лимиты', 'Доступные инструменты', 'Доступные модели'],
+    columns: ['ФИО', 'Роль', 'Дата/Время', 'Активных чатов', 'Сообщений', 'Потрачено', 'Текущие лимиты', 'Доступные инструменты', 'Доступные модели'],
     sortableColumns: ['fio', 'role', 'lastActivity', 'activeChats', 'messagesCount', 'moneySpent', null, null, null],
     filters: [
       { id: 'period', label: 'Период', type: 'date-range', fromField: 'activityFrom', toField: 'activityTo' },
@@ -2020,14 +2020,6 @@ export default function AdminDashboard() {
                 <span>Лимит сообщений в день</span>
                 <input type="number" placeholder="100" defaultValue="100" />
               </label>
-              <label className="modal-field">
-                <span>Лимит токенов в день</span>
-                <input type="number" placeholder="50000" defaultValue="50000" />
-              </label>
-              <label className="modal-field">
-                <span>Стоимостной лимит ($)</span>
-                <input type="number" placeholder="10" defaultValue="10" step="0.01" />
-              </label>
             </div>
           )
         case 'tools':
@@ -2041,16 +2033,8 @@ export default function AdminDashboard() {
                     <span>Web Search</span>
                   </label>
                   <label className="checkbox-item">
-                    <input type="checkbox" defaultChecked />
-                    <span>Code Interpreter</span>
-                  </label>
-                  <label className="checkbox-item">
                     <input type="checkbox" />
                     <span>Image Generation</span>
-                  </label>
-                  <label className="checkbox-item">
-                    <input type="checkbox" defaultChecked />
-                    <span>Calculator</span>
                   </label>
                 </div>
               </div>
