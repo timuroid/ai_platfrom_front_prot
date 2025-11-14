@@ -237,6 +237,7 @@ export default function LLMChatInterface() {
   const [streamingMessages, setStreamingMessages] = useState(new Map());
   const [showTeachingCards, setShowTeachingCards] = useState(false);
   const [showAllChats, setShowAllChats] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState([]);
   const streamingIntervalsRef = useRef(new Map());
   const toolsMenuRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -396,6 +397,37 @@ export default function LLMChatInterface() {
     }
   };
 
+  const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+
+    const newFiles = files.map((file) => ({
+      id: `${Date.now()}-${Math.random()}`,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      file: file
+    }));
+
+    setAttachedFiles((prev) => [...prev, ...newFiles]);
+    // Reset input value to allow selecting the same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = (fileId) => {
+    setAttachedFiles((prev) => prev.filter((f) => f.id !== fileId));
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
   const handleExport = (messageText, format) => {
     const blob = new Blob([messageText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -523,18 +555,20 @@ export default function LLMChatInterface() {
   };
 
   const sendMessage = () => {
-    if (isRecording || isProcessingVoice || !message.trim()) return;
+    if (isRecording || isProcessingVoice || (!message.trim() && attachedFiles.length === 0)) return;
 
     const chatId = activeChat;
     const originalMessage = message;
     const toolSnapshot = { webSearch, imageGen };
     const isFirstMessage = messages.length === 0;
+    const filesSnapshot = [...attachedFiles];
 
     const userMessage = {
       id: Date.now(),
       text: originalMessage,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      files: filesSnapshot.length > 0 ? filesSnapshot : undefined
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -546,6 +580,7 @@ export default function LLMChatInterface() {
       )
     );
     setMessage('');
+    setAttachedFiles([]);
 
     setTimeout(() => {
       const responseId = Date.now();
@@ -795,7 +830,18 @@ export default function LLMChatInterface() {
                 msg.sender === 'user' ? (
                   <div key={msg.id} className="message-user">
                     <div className="user-bubble">
-                      {msg.text}
+                      {msg.files && msg.files.length > 0 && (
+                        <div className="message-files">
+                          {msg.files.map((file) => (
+                            <div key={file.id} className="message-file-item">
+                              <FileText size={16} />
+                              <span className="message-file-name">{file.name}</span>
+                              <span className="message-file-size">{formatFileSize(file.size)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {msg.text && <div className="user-message-text">{msg.text}</div>}
                     </div>
                     <div className="message-user-footer">
                       <button
@@ -919,6 +965,32 @@ export default function LLMChatInterface() {
           </div>
         </div>
         </section>
+
+        {attachedFiles.length > 0 && (
+          <div className="attached-files-area">
+            <div className="attached-files-container">
+              {attachedFiles.map((file) => (
+                <div key={file.id} className="attached-file-item">
+                  <div className="attached-file-icon">
+                    <FileText size={20} />
+                  </div>
+                  <div className="attached-file-info">
+                    <div className="attached-file-name">{file.name}</div>
+                    <div className="attached-file-size">{formatFileSize(file.size)}</div>
+                  </div>
+                  <button
+                    type="button"
+                    className="attached-file-remove"
+                    onClick={() => handleRemoveFile(file.id)}
+                    aria-label="Удалить файл"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="composer-shell">
           <div className="composer">
@@ -1147,7 +1219,13 @@ export default function LLMChatInterface() {
         </div>
       )}
 
-      <input ref={fileInputRef} type="file" className="hidden" multiple />
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        multiple
+        onChange={handleFileSelect}
+      />
 
       {showTeachingCards && (
         <TeachingCards
