@@ -1221,6 +1221,8 @@
   min-height: 32px;
   line-height: 1.5;
   resize: none;
+  overflow-y: auto;
+  max-height: calc(1.5em * 5);
 }
 
 .composer-input:focus,
@@ -1723,7 +1725,7 @@
 
 .attached-files-area {
   padding: 0 var(--space-4);
-  background: var(--surface-canvas);
+  background: transparent;
   animation: slideInUp 0.3s var(--motion-ease-out);
 }
 

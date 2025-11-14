@@ -9,63 +9,44 @@
 }
 
 .all-chats-view-header {
-  padding: var(--space-4);
-  border-bottom: 1px solid var(--border-default);
-  background: var(--surface-canvas);
-}
-
-.all-chats-view-header-inner {
-  max-width: 960px;
-  margin: 0 auto;
-  width: 100%;
+  background: transparent;
+  border: none;
+  padding: calc((var(--space-10) + var(--space-3)) * 2) var(--space-4) calc((var(--space-8) + var(--space-3)) * 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .all-chats-view-title {
-  margin: 0 0 var(--space-4) 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.all-chats-view-actions {
-  display: flex;
-  gap: var(--space-3);
-}
-
-.search-input-wrapper {
-  position: relative;
-  flex: 1;
-  max-width: 400px;
-}
-
-.search-icon {
-  position: absolute;
-  left: var(--space-3);
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-tertiary);
-  pointer-events: none;
-}
-
-.search-input {
+  max-width: 960px;
   width: 100%;
-  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-9);
-  background: var(--surface-elevated);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-size: 14px;
-  transition: all var(--motion-duration-fast) var(--motion-ease-out);
+  margin: 0;
+  padding-top: calc(var(--space-4) * 2);
+  padding-bottom: calc(var(--space-4) * 2);
+  font-size: clamp(2rem, 2.8vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  animation: headingFadeIn 0.6s var(--motion-ease-out);
+  background: linear-gradient(
+    135deg,
+    var(--text-primary),
+    color-mix(in srgb, var(--text-primary) 70%, var(--brand-primary))
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.search-input::placeholder {
-  color: var(--text-tertiary);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(255, 60, 0, 0.1);
+@keyframes headingFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .all-chats-view-content {
