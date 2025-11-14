@@ -9,13 +9,13 @@
 }
 
 .all-chats-view-header {
-  padding: var(--space-6);
+  padding: var(--space-4);
   border-bottom: 1px solid var(--border-default);
   background: var(--surface-canvas);
 }
 
 .all-chats-view-header-inner {
-  max-width: 980px;
+  max-width: 960px;
   margin: 0 auto;
   width: 100%;
 }
@@ -71,11 +71,11 @@
 .all-chats-view-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-6);
+  padding: var(--space-4);
 }
 
 .all-chats-view-content-inner {
-  max-width: 980px;
+  max-width: 960px;
   margin: 0 auto;
   width: 100%;
 }
