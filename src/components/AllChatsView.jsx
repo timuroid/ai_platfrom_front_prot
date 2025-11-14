@@ -1,27 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Search, Plus, Trash2, Calendar } from 'lucide-react';
+import { MessageSquare, Plus, Trash2, Calendar } from 'lucide-react';
 import './AllChatsView.css';
 
 export default function AllChatsView({ chats, onChatSelect, onNewChat, onDeleteChat }) {
-  const [searchQuery, setSearchQuery] = useState('');
   const [filteredChats, setFilteredChats] = useState([]);
 
   useEffect(() => {
     setFilteredChats(chats);
   }, [chats]);
-
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredChats(chats);
-    } else {
-      const query = searchQuery.toLowerCase();
-      const filtered = chats.filter(chat =>
-        chat.title.toLowerCase().includes(query) ||
-        chat.messages.some(msg => msg.text?.toLowerCase().includes(query))
-      );
-      setFilteredChats(filtered);
-    }
-  }, [searchQuery, chats]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -63,22 +49,7 @@ export default function AllChatsView({ chats, onChatSelect, onNewChat, onDeleteC
   return (
     <div className="all-chats-view">
       <div className="all-chats-view-header">
-        <div className="all-chats-view-header-inner">
-          <h2 className="all-chats-view-title">Все чаты</h2>
-
-          <div className="all-chats-view-actions">
-            <div className="search-input-wrapper">
-              <Search size={18} className="search-icon" />
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Поиск по чатам..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
+        <h1 className="all-chats-view-title">Все чаты</h1>
       </div>
 
       <div className="all-chats-view-content">
@@ -87,11 +58,7 @@ export default function AllChatsView({ chats, onChatSelect, onNewChat, onDeleteC
           <div className="empty-state">
             <MessageSquare size={64} />
             <h3>Нет чатов</h3>
-            <p>
-              {searchQuery.trim() !== ''
-                ? 'По вашему запросу ничего не найдено'
-                : 'Начните новый чат, чтобы он появился здесь'}
-            </p>
+            <p>Начните новый чат, чтобы он появился здесь</p>
             <button
               type="button"
               className="primary-button"

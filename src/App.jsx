@@ -245,6 +245,7 @@ export default function LLMChatInterface() {
   const recordTimerRef = useRef(null);
   const recordStartRef = useRef(0);
   const voiceProcessingTimeoutRef = useRef(null);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     if (!showTools) return;
@@ -288,6 +289,20 @@ export default function LLMChatInterface() {
       container.scrollTop = container.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const adjustHeight = () => {
+      textarea.style.height = 'auto';
+      const maxHeight = parseFloat(getComputedStyle(textarea).lineHeight) * 5; // 5 строк
+      const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+      textarea.style.height = `${newHeight}px`;
+    };
+
+    adjustHeight();
+  }, [message]);
 
   const createNewChat = () => {
     const newChat = {
@@ -1059,6 +1074,7 @@ export default function LLMChatInterface() {
                   </div>
                 ) : (
                   <textarea
+                    ref={textareaRef}
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
                     onKeyPress={handleKeyPress}
