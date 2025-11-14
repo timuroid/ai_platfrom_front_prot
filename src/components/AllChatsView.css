@@ -1,4 +1,6 @@
 .all-chats-view {
+  --admin-max-width: 980px;
+  --admin-content-gutter: clamp(var(--space-4), 4vw, var(--space-7));
   width: 100%;
   height: 100vh;
   display: flex;
@@ -11,23 +13,28 @@
 .all-chats-view-header {
   background: transparent;
   border: none;
-  padding: calc((var(--space-10) + var(--space-3)) * 2) var(--space-4) calc((var(--space-8) + var(--space-3)) * 2);
+  padding: calc((var(--space-10) + var(--space-3)) * 2) var(--admin-content-gutter) calc((var(--space-8) + var(--space-3)) * 2);
   display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-7) * 2);
   align-items: center;
-  justify-content: center;
+}
+
+.all-chats-view-header > * {
+  width: min(100%, var(--admin-max-width));
+  margin: 0 auto;
+  padding: 0;
 }
 
 .all-chats-view-title {
-  max-width: 960px;
-  width: 100%;
-  margin: 0;
+  margin: 0 0 calc(var(--space-7) * 2);
   padding-top: calc(var(--space-4) * 2);
   padding-bottom: calc(var(--space-4) * 2);
   font-size: clamp(2rem, 2.8vw, 2.5rem);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.15;
-  animation: headingFadeIn 0.6s var(--motion-ease-out);
+  animation: headingFadeIn 0.6s var(--motion-ease-decelerate);
   background: linear-gradient(
     135deg,
     var(--text-primary),
@@ -52,11 +59,11 @@
 .all-chats-view-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-4);
+  padding: 0 var(--admin-content-gutter) var(--space-6);
 }
 
 .all-chats-view-content-inner {
-  max-width: 960px;
+  max-width: var(--admin-max-width);
   margin: 0 auto;
   width: 100%;
 }
