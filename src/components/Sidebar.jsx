@@ -222,6 +222,21 @@ export default function Sidebar({
           <span className="sidebar-nested-title">{nestedView.name}</span>
         </div>
 
+        {/* Кнопка Новый чат */}
+        <div className="sidebar-action">
+          <button
+            type="button"
+            className="sidebar-button"
+            onClick={handleNewChat}
+            title="Новый чат"
+          >
+            <span className="sidebar-button-icon">
+              <Plus size={18} />
+            </span>
+            <span className="sidebar-button-text">Новый чат</span>
+          </button>
+        </div>
+
         {/* Чаты этого бота/инструмента */}
         <div className="sidebar-nested-chats-label">
           Чаты {typeLabel}
@@ -397,7 +412,7 @@ export default function Sidebar({
               </button>
             ))}
 
-            {hasMoreChats && (
+            {chats.length > 0 && (
               <button
                 type="button"
                 className="chat-item view-all-chats-btn"

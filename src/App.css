@@ -67,61 +67,62 @@
 }
 
 .sidebar-action {
-  padding: 0 var(--space-4) var(--space-4);
+  padding: 0 var(--space-4) var(--space-3);
 }
 
 .sidebar-button {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: var(--space-3) var(--space-4) var(--space-3) 16px;
-  border: none;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-card);
   background: var(--surface-subtle);
   color: var(--text-primary);
   font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  position: relative;
-  min-height: 44px;
+  min-height: 40px;
   transition:
     background var(--motion-duration-fast, 0.15s) var(--motion-ease-standard, ease),
+    border-color var(--motion-duration-fast, 0.15s) var(--motion-ease-standard, ease),
     color var(--motion-duration-fast, 0.15s) var(--motion-ease-standard, ease);
 }
 
 .sidebar-button:hover {
   background: var(--hover-subtle);
+  border-color: var(--brand-primary);
 }
 
 .sidebar-button-icon {
-  position: absolute;
-  left: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .sidebar-button-text {
   opacity: 1;
   transition: opacity 0.2s ease 0.2s;
   white-space: nowrap;
-  margin-left: 32px;
 }
 
 .app-sidebar.is-collapsed .sidebar-action {
-  padding: 0 var(--space-4) var(--space-4);
+  padding: 0 var(--space-3) var(--space-3);
 }
 
 .app-sidebar.is-collapsed .sidebar-button {
-  padding: var(--space-3) var(--space-4) var(--space-3) 16px;
+  padding: var(--space-2);
+  justify-content: center;
 }
 
 .app-sidebar.is-collapsed .sidebar-button-text {
   opacity: 0;
   width: 0;
   overflow: hidden;
-  margin-left: 0;
   transition: opacity 0.15s ease;
 }
 
@@ -186,6 +187,7 @@
   transition: opacity 0.2s ease 0.2s;
   text-align: left;
   margin-left: 30px;
+  font-size: 0.8125rem;
 }
 
 .app-sidebar.is-collapsed .chat-item {
@@ -2182,6 +2184,8 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
   animation: slideInFromLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2190,6 +2194,8 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
   animation: slideInFromRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2308,6 +2314,25 @@
   flex: 1;
   overflow-y: auto;
   padding: 0 var(--space-2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+
+.nested-chat-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nested-chat-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nested-chat-list::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+.nested-chat-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
 /* Empty state */
@@ -2321,7 +2346,7 @@
 
 /* Spacer between sections */
 .sidebar-spacer {
-  height: var(--space-6);
+  height: var(--space-2);
   flex-shrink: 0;
 }
 
@@ -2331,13 +2356,49 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .sidebar-chats-section .chat-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0;
+  padding: 0 var(--space-2);
   animation: fadeInDown 0.2s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+
+.sidebar-chats-section .chat-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-chats-section .chat-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-chats-section .chat-list::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+.sidebar-chats-section .chat-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* View all chats button */
+.view-all-chats-btn {
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--border-default);
+  padding-top: var(--space-3) !important;
+  color: var(--text-secondary) !important;
+}
+
+.view-all-chats-btn:hover {
+  color: var(--brand-primary) !important;
+}
+
+.view-all-chats-btn .chat-item-icon {
+  color: inherit;
 }
 
 @keyframes fadeInDown {
