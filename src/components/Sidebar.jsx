@@ -72,7 +72,6 @@ export default function Sidebar({
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [botsExpanded, setBotsExpanded] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
-  const [chatsExpanded, setChatsExpanded] = useState(false)
   // Nested view states - когда выбран конкретный бот или инструмент
   const [nestedView, setNestedView] = useState(null) // { type: 'bot'|'tool', id: string, name: string, icon: Component }
 
@@ -141,15 +140,6 @@ export default function Sidebar({
       onBotSelect(null)
     } else if (nestedView?.type === 'tool') {
       onToolSelect(null)
-    }
-  }
-
-  const toggleChatsSection = () => {
-    if (!isOpen) {
-      onToggle(true)
-      setTimeout(() => setChatsExpanded(true), 300)
-    } else {
-      setChatsExpanded(!chatsExpanded)
     }
   }
 
@@ -222,24 +212,17 @@ export default function Sidebar({
           <span className="sidebar-nested-title">{nestedView.name}</span>
         </div>
 
-        {/* Кнопка Новый чат */}
-        <div className="sidebar-action">
+        {/* Чаты этого бота/инструмента */}
+        <div className="sidebar-nested-chats-header">
+          <span className="sidebar-nested-chats-label">Чаты {typeLabel}</span>
           <button
             type="button"
-            className="sidebar-button"
+            className="sidebar-section-plus"
             onClick={handleNewChat}
             title="Новый чат"
           >
-            <span className="sidebar-button-icon">
-              <Plus size={18} />
-            </span>
-            <span className="sidebar-button-text">Новый чат</span>
+            <Plus size={16} />
           </button>
-        </div>
-
-        {/* Чаты этого бота/инструмента */}
-        <div className="sidebar-nested-chats-label">
-          Чаты {typeLabel}
         </div>
 
         <div className={`chat-list nested-chat-list ${!isOpen ? 'is-collapsed' : ''}`}>
@@ -299,18 +282,31 @@ export default function Sidebar({
             {BOTS.map((bot) => {
               const Icon = bot.icon
               return (
-                <button
-                  key={bot.id}
-                  type="button"
-                  className={`sidebar-section-item ${activeBot === bot.id ? 'is-active' : ''}`}
-                  onClick={() => handleBotClick(bot)}
-                  title={bot.name}
-                >
-                  <span className="sidebar-section-item-icon">
-                    <Icon size={16} />
-                  </span>
-                  <span className="sidebar-section-item-text">{bot.name}</span>
-                </button>
+                <div key={bot.id} className="sidebar-section-item-wrapper">
+                  <button
+                    type="button"
+                    className="sidebar-section-item"
+                    onClick={() => handleBotClick(bot)}
+                    title={bot.name}
+                  >
+                    <span className="sidebar-section-item-icon">
+                      <Icon size={16} />
+                    </span>
+                    <span className="sidebar-section-item-text">{bot.name}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="sidebar-section-item-plus"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onBotSelect(bot)
+                      onNewChat()
+                    }}
+                    title="Новый чат"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
               )
             })}
           </div>
@@ -338,59 +334,57 @@ export default function Sidebar({
             {TOOLS.map((tool) => {
               const Icon = tool.icon
               return (
-                <button
-                  key={tool.id}
-                  type="button"
-                  className={`sidebar-section-item ${activeTool === tool.id ? 'is-active' : ''}`}
-                  onClick={() => handleToolClick(tool)}
-                  title={tool.name}
-                >
-                  <span className="sidebar-section-item-icon">
-                    <Icon size={16} />
-                  </span>
-                  <span className="sidebar-section-item-text">{tool.name}</span>
-                </button>
+                <div key={tool.id} className="sidebar-section-item-wrapper">
+                  <button
+                    type="button"
+                    className="sidebar-section-item"
+                    onClick={() => handleToolClick(tool)}
+                    title={tool.name}
+                  >
+                    <span className="sidebar-section-item-icon">
+                      <Icon size={16} />
+                    </span>
+                    <span className="sidebar-section-item-text">{tool.name}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="sidebar-section-item-plus"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onToolSelect(tool)
+                      onNewChat()
+                    }}
+                    title="Новый чат"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
               )
             })}
           </div>
         )}
       </div>
 
-      {/* Разделитель между Инструменты и Новый чат */}
+      {/* Разделитель между Инструменты и Чаты */}
       <div className="sidebar-divider" />
-
-      {/* Кнопка Новый чат */}
-      <div className="sidebar-action">
-        <button
-          type="button"
-          className="sidebar-button"
-          onClick={handleNewChat}
-          title="Новый чат"
-        >
-          <span className="sidebar-button-icon">
-            <Plus size={20} />
-          </span>
-          <span className="sidebar-button-text">Новый чат</span>
-        </button>
-      </div>
 
       {/* Раздел Чаты */}
       <div className="sidebar-section sidebar-chats-section">
-        <button
-          type="button"
-          className="sidebar-section-header"
-          onClick={toggleChatsSection}
-          title="Чаты"
-        >
+        <div className="sidebar-section-header sidebar-section-header-static">
           <span className="sidebar-section-icon">
             <MessageSquare size={18} />
           </span>
           <span className="sidebar-section-title">Чаты</span>
-          <span className="sidebar-section-chevron">
-            {chatsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-          </span>
-        </button>
-        {chatsExpanded && isOpen && (
+          <button
+            type="button"
+            className="sidebar-section-plus"
+            onClick={handleNewChat}
+            title="Новый чат"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+        {isOpen && (
           <div className={`chat-list ${!isOpen ? 'is-collapsed' : ''}`}>
             {visibleChats.map((chat) => (
               <button
