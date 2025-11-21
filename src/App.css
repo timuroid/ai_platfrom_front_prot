@@ -2163,3 +2163,201 @@
 .tz-analyze-button:active {
   transform: scale(0.98);
 }
+
+/* =====================================================
+   Sidebar Nested View & Animations
+   ===================================================== */
+
+/* Wrapper для анимации переходов */
+.sidebar-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Default view */
+.sidebar-default-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  animation: slideInFromLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Nested view */
+.sidebar-nested-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  animation: slideInFromRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animations */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Back button */
+.sidebar-back-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  margin: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-input);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.sidebar-back-button:hover {
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+}
+
+.sidebar-back-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-back-text {
+  font-weight: 500;
+}
+
+.app-sidebar.is-collapsed .sidebar-back-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Nested header (selected bot/tool) */
+.sidebar-nested-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin: 0 var(--space-3);
+  background: var(--surface-subtle);
+  border-radius: var(--radius-card);
+  border-left: 3px solid var(--brand-primary);
+}
+
+.sidebar-nested-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-primary);
+}
+
+.sidebar-nested-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+}
+
+.app-sidebar.is-collapsed .sidebar-nested-title {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Nested chats label */
+.sidebar-nested-chats-label {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.app-sidebar.is-collapsed .sidebar-nested-chats-label {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Nested chat list */
+.nested-chat-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--space-2);
+}
+
+/* Empty state */
+.sidebar-empty-state {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+/* Spacer between sections */
+.sidebar-spacer {
+  height: var(--space-6);
+  flex-shrink: 0;
+}
+
+/* Chats section specific */
+.sidebar-chats-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebar-chats-section .chat-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Improved section styling */
+.sidebar-section-content {
+  animation: fadeInDown 0.2s ease-out;
+}
+
+/* User section positioning */
+.sidebar-content-wrapper .user-section {
+  margin-top: auto;
+  flex-shrink: 0;
+}
