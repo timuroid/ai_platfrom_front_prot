@@ -27,6 +27,9 @@ import {
 import Sidebar from '../components/Sidebar.jsx'
 import EmptyState from './components/EmptyState.jsx'
 import DateRangePicker from './components/DateRangePicker.jsx'
+import UserDetails from './components/UserDetails.jsx'
+import DialogDetails from './components/DialogDetails.jsx'
+import ToolDetails from './components/ToolDetails.jsx'
 import './Admin.css'
 
 const DASHBOARD_MODES = {
@@ -417,6 +420,7 @@ export default function AdminDashboard() {
   const [modalState, setModalState] = useState({ isOpen: false, type: null })
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, data: null })
   const [hoveredDataIndex, setHoveredDataIndex] = useState(null)
+  const [detailView, setDetailView] = useState({ type: null, item: null })
   const dropdownRefs = useRef({})
   const chartKey = useRef(0)
 
@@ -680,6 +684,23 @@ export default function AdminDashboard() {
     setModalState({ isOpen: false, type: null })
   }
 
+  // Функции навигации к детальным страницам
+  const navigateToUserDetails = (user) => {
+    setDetailView({ type: 'user', item: user })
+  }
+
+  const navigateToDialogDetails = (dialog) => {
+    setDetailView({ type: 'dialog', item: dialog })
+  }
+
+  const navigateToToolDetails = (tool) => {
+    setDetailView({ type: 'tool', item: tool })
+  }
+
+  const navigateBackToList = () => {
+    setDetailView({ type: null, item: null })
+  }
+
   const handleModalSubmit = (data) => {
     console.log(`Modal submit for ${modalState.type}:`, data, 'users:', selectedUsers)
     // Здесь будет API запрос для обновления данных
@@ -693,9 +714,10 @@ export default function AdminDashboard() {
   }, [selectedUsers])
 
   useEffect(() => {
-    // Сбрасываем выбор при смене секции
+    // Сбрасываем выбор и детальный вид при смене секции
     setSelectedUsers([])
     setSortConfig({ column: null, direction: null })
+    setDetailView({ type: null, item: null })
   }, [section])
 
   useEffect(() => {
@@ -1781,7 +1803,15 @@ export default function AdminDashboard() {
                   )}
                 </button>
               </td>
-              <td>{user.fio}</td>
+              <td>
+                <button
+                  type="button"
+                  className="clickable-cell"
+                  onClick={() => navigateToUserDetails(user)}
+                >
+                  {user.fio}
+                </button>
+              </td>
               <td>
                 <span className={`role-badge role-${user.role}`}>
                   {user.role === 'admin' ? 'Администратор' : 'Пользователь'}
@@ -1805,7 +1835,15 @@ export default function AdminDashboard() {
         <tbody>
           {data.map((dialog) => (
             <tr key={dialog.id}>
-              <td><strong>{dialog.dialogNumber}</strong></td>
+              <td>
+                <button
+                  type="button"
+                  className="clickable-cell"
+                  onClick={() => navigateToDialogDetails(dialog)}
+                >
+                  {dialog.dialogNumber}
+                </button>
+              </td>
               <td>{new Date(dialog.createdAt).toLocaleString('ru-RU')}</td>
               <td>{dialog.user}</td>
               <td>{dialog.depth}</td>
@@ -1860,7 +1898,15 @@ export default function AdminDashboard() {
         <tbody>
           {data.map((tool) => (
             <tr key={tool.id}>
-              <td><strong>{tool.name}</strong></td>
+              <td>
+                <button
+                  type="button"
+                  className="clickable-cell"
+                  onClick={() => navigateToToolDetails(tool)}
+                >
+                  {tool.name}
+                </button>
+              </td>
               <td><span className="text-small">{tool.description}</span></td>
               <td>
                 <span className={`status-badge status-${tool.status}`}>
@@ -2231,30 +2277,46 @@ export default function AdminDashboard() {
       />
 
       <main className="admin-main">
-        {section === 'dashboards' ? (
+        {/* Детальные страницы */}
+        {detailView.type === 'user' && detailView.item && (
+          <UserDetails user={detailView.item} onBack={navigateBackToList} />
+        )}
+        {detailView.type === 'dialog' && detailView.item && (
+          <DialogDetails dialog={detailView.item} onBack={navigateBackToList} />
+        )}
+        {detailView.type === 'tool' && detailView.item && (
+          <ToolDetails tool={detailView.item} onBack={navigateBackToList} />
+        )}
+
+        {/* Основной контент (если не открыта детальная страница) */}
+        {!detailView.type && (
           <>
-            {renderDashboardToolbar()}
-            <div className="admin-viewport">
-              <div className="admin-content dashboards-view">
-                {renderDashboardFilters()}
-                <div className="mode-switch-grid">
-                  {DASHBOARD_MODE_IDS.map((modeId) => (
-                    <button
-                      key={modeId}
-                      type="button"
-                      className={`dashboard-mode-button ${dashboardMode === modeId ? 'is-active' : ''}`}
-                      onClick={() => setDashboardMode(modeId)}
-                    >
-                      <span className="mode-title">{DASHBOARD_MODES[modeId].title}</span>
-                    </button>
-                  ))}
+            {section === 'dashboards' ? (
+              <>
+                {renderDashboardToolbar()}
+                <div className="admin-viewport">
+                  <div className="admin-content dashboards-view">
+                    {renderDashboardFilters()}
+                    <div className="mode-switch-grid">
+                      {DASHBOARD_MODE_IDS.map((modeId) => (
+                        <button
+                          key={modeId}
+                          type="button"
+                          className={`dashboard-mode-button ${dashboardMode === modeId ? 'is-active' : ''}`}
+                          onClick={() => setDashboardMode(modeId)}
+                        >
+                          <span className="mode-title">{DASHBOARD_MODES[modeId].title}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {renderDashboardAnalytics()}
+                  </div>
                 </div>
-                {renderDashboardAnalytics()}
-              </div>
-            </div>
+              </>
+            ) : (
+              renderManagementView()
+            )}
           </>
-        ) : (
-          renderManagementView()
         )}
       </main>
       {renderTooltip()}
