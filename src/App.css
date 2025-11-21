@@ -2008,7 +2008,7 @@
   color: var(--brand-primary);
 }
 
-/* Static header for Chats section (no hover) */
+/* Static header for Chats section (no hover on text, only on plus) */
 .sidebar-section-header-static {
   width: 100%;
   display: flex;
@@ -2020,6 +2020,11 @@
   color: var(--text-secondary);
   font-size: 0.875rem;
   cursor: default;
+  pointer-events: none;
+}
+
+.sidebar-section-header-static .sidebar-section-plus {
+  pointer-events: auto;
 }
 
 .sidebar-section-plus {
@@ -2295,8 +2300,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  margin: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-2);
+  margin: var(--space-2) var(--space-2);
   border: none;
   border-radius: var(--radius-input);
   background: transparent;
@@ -2329,25 +2334,31 @@
   overflow: hidden;
 }
 
-/* Nested header (selected bot/tool) */
+/* Nested header (selected bot/tool with plus button) */
 .sidebar-nested-header {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-3);
+  margin: 0 var(--space-2);
 }
 
 .sidebar-nested-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
+  color: var(--brand-primary);
 }
 
 .sidebar-nested-title {
+  flex: 1;
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+}
+
+.sidebar-nested-header .sidebar-section-plus {
+  margin-left: auto;
 }
 
 .app-sidebar.is-collapsed .sidebar-nested-title {
@@ -2356,27 +2367,9 @@
   overflow: hidden;
 }
 
-/* Nested chats header with plus button */
-.sidebar-nested-chats-header {
-  display: flex;
-  align-items: center;
-  padding: var(--space-3) var(--space-4);
-}
-
-.sidebar-nested-chats-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  flex: 1;
-}
-
-.app-sidebar.is-collapsed .sidebar-nested-chats-header {
+.app-sidebar.is-collapsed .sidebar-nested-header .sidebar-section-plus {
   opacity: 0;
-  height: 0;
-  padding: 0;
-  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Nested chat list */

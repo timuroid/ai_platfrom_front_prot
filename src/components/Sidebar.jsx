@@ -187,7 +187,6 @@ export default function Sidebar({
   // Рендер nested view (когда выбран бот или инструмент)
   const renderNestedView = () => {
     const Icon = nestedView.icon
-    const typeLabel = nestedView.type === 'bot' ? 'бота' : 'инструмента'
 
     return (
       <div className="sidebar-nested-view">
@@ -204,17 +203,12 @@ export default function Sidebar({
           <span className="sidebar-back-text">Назад</span>
         </button>
 
-        {/* Выбранный бот/инструмент */}
+        {/* Заголовок с названием бота/инструмента и плюсиком */}
         <div className="sidebar-nested-header">
           <span className="sidebar-nested-icon">
             <Icon size={20} />
           </span>
           <span className="sidebar-nested-title">{nestedView.name}</span>
-        </div>
-
-        {/* Чаты этого бота/инструмента */}
-        <div className="sidebar-nested-chats-header">
-          <span className="sidebar-nested-chats-label">Чаты {typeLabel}</span>
           <button
             type="button"
             className="sidebar-section-plus"
