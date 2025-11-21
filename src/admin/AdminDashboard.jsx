@@ -129,8 +129,9 @@ const MANAGEMENT_SECTIONS = {
     ]
   },
   tools: {
-    title: 'Инструменты (управление)',
-    columns: ['Инструмент', 'Описание', 'Статус', 'Вызовы 30д', 'Ошибки %', '$/Invoke', 'Действия'],
+    title: 'Инструменты',
+    columns: ['Название', 'Описание', 'Статус', 'Пользователей', 'Запусков (30д)', 'Успешность', 'Ср. время ответа', 'Создан'],
+    sortableColumns: ['name', 'description', 'status', 'usersCount', 'runs30d', 'successRate', 'avgResponseTime', 'createdAt'],
     filters: [
       {
         id: 'status',
@@ -138,11 +139,29 @@ const MANAGEMENT_SECTIONS = {
         type: 'select',
         options: [
           { value: 'all', label: 'Все' },
-          { value: 'on', label: 'Включён' },
-          { value: 'off', label: 'Выключен' }
+          { value: 'active', label: 'Активен' },
+          { value: 'inactive', label: 'Неактивен' }
         ]
       },
       { id: 'search', label: 'Поиск', type: 'text', placeholder: 'Название инструмента' }
+    ]
+  },
+  bots: {
+    title: 'Боты',
+    columns: ['Название', 'Описание', 'Статус', 'Пользователей', 'Диалогов (30д)', 'Сообщений (30д)', 'Успешность', 'Ср. оценка', 'Создан'],
+    sortableColumns: ['name', 'description', 'status', 'usersCount', 'dialogs30d', 'messages30d', 'successRate', 'avgRating', 'createdAt'],
+    filters: [
+      {
+        id: 'status',
+        label: 'Статус',
+        type: 'select',
+        options: [
+          { value: 'all', label: 'Все' },
+          { value: 'active', label: 'Активен' },
+          { value: 'inactive', label: 'Неактивен' }
+        ]
+      },
+      { id: 'search', label: 'Поиск', type: 'text', placeholder: 'Название бота' }
     ]
   },
   models: {
@@ -199,6 +218,49 @@ const MOCK_FILES = [
   { id: 8, name: 'screenshot.jpg', type: 'image', size: '2.1 MB', user: 'Соколова О.Н.', dialog: 'DLG-1008', uploadedAt: '2025-11-10T15:15:00', dlpStatus: 'approved' },
   { id: 9, name: 'sensitive_data.csv', type: 'document', size: '5.6 MB', user: 'Иванов И.И.', dialog: 'DLG-1001', uploadedAt: '2025-11-10T09:00:00', dlpStatus: 'rejected' },
   { id: 10, name: 'diagram.svg', type: 'image', size: '0.3 MB', user: 'Сидоров П.А.', dialog: 'DLG-1003', uploadedAt: '2025-11-11T10:20:00', dlpStatus: 'approved' }
+]
+
+// Моковые данные для инструментов
+const MOCK_TOOLS = [
+  {
+    id: 1,
+    name: 'TZ Expert',
+    description: 'Генерация технических заданий на основе требований',
+    status: 'active',
+    usersCount: 45,
+    runs30d: 1250,
+    successRate: 94.5,
+    avgResponseTime: '2.3 сек',
+    createdAt: '2025-08-15T10:00:00'
+  }
+]
+
+// Моковые данные для ботов
+const MOCK_BOTS = [
+  {
+    id: 1,
+    name: '5 почему',
+    description: 'Бот для глубинного анализа проблем методом "5 почему"',
+    status: 'active',
+    usersCount: 78,
+    dialogs30d: 456,
+    messages30d: 2340,
+    successRate: 89.2,
+    avgRating: 4.6,
+    createdAt: '2025-07-20T14:30:00'
+  },
+  {
+    id: 2,
+    name: 'Поисковик',
+    description: 'Интеллектуальный поиск информации по базе знаний',
+    status: 'active',
+    usersCount: 112,
+    dialogs30d: 890,
+    messages30d: 4560,
+    successRate: 92.8,
+    avgRating: 4.8,
+    createdAt: '2025-06-10T09:00:00'
+  }
 ]
 
 // Моковые данные для графика "Активность" (30 дней)
@@ -330,7 +392,7 @@ const buildHash = (section, mode, dashboardFilters = {}) => {
   return query ? `#/admin?${query}` : '#/admin'
 }
 
-const ROOT_SECTIONS = ['dashboards', 'users', 'dialogs', 'files']
+const ROOT_SECTIONS = ['dashboards', 'users', 'dialogs', 'files', 'tools', 'bots']
 
 export default function AdminDashboard() {
   const initialQuery = useMemo(() => parseHashState(), [])
@@ -428,6 +490,8 @@ export default function AdminDashboard() {
     if (sectionId === 'users') return MOCK_USERS
     if (sectionId === 'dialogs') return MOCK_DIALOGS
     if (sectionId === 'files') return MOCK_FILES
+    if (sectionId === 'tools') return MOCK_TOOLS
+    if (sectionId === 'bots') return MOCK_BOTS
     return []
   }
 
@@ -1787,6 +1851,57 @@ export default function AdminDashboard() {
               </tr>
             )
           })}
+        </tbody>
+      )
+    }
+
+    if (section === 'tools') {
+      return (
+        <tbody>
+          {data.map((tool) => (
+            <tr key={tool.id}>
+              <td><strong>{tool.name}</strong></td>
+              <td><span className="text-small">{tool.description}</span></td>
+              <td>
+                <span className={`status-badge status-${tool.status}`}>
+                  {tool.status === 'active' ? 'Активен' : 'Неактивен'}
+                </span>
+              </td>
+              <td>{tool.usersCount}</td>
+              <td>{tool.runs30d.toLocaleString('ru-RU')}</td>
+              <td>{tool.successRate}%</td>
+              <td>{tool.avgResponseTime}</td>
+              <td>{new Date(tool.createdAt).toLocaleDateString('ru-RU')}</td>
+            </tr>
+          ))}
+        </tbody>
+      )
+    }
+
+    if (section === 'bots') {
+      return (
+        <tbody>
+          {data.map((bot) => (
+            <tr key={bot.id}>
+              <td><strong>{bot.name}</strong></td>
+              <td><span className="text-small">{bot.description}</span></td>
+              <td>
+                <span className={`status-badge status-${bot.status}`}>
+                  {bot.status === 'active' ? 'Активен' : 'Неактивен'}
+                </span>
+              </td>
+              <td>{bot.usersCount}</td>
+              <td>{bot.dialogs30d.toLocaleString('ru-RU')}</td>
+              <td>{bot.messages30d.toLocaleString('ru-RU')}</td>
+              <td>{bot.successRate}%</td>
+              <td>
+                <span className="rating-badge">
+                  ★ {bot.avgRating.toFixed(1)}
+                </span>
+              </td>
+              <td>{new Date(bot.createdAt).toLocaleDateString('ru-RU')}</td>
+            </tr>
+          ))}
         </tbody>
       )
     }

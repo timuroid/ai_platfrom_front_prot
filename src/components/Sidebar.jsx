@@ -11,7 +11,8 @@ import {
   FileText,
   Wrench,
   Cpu,
-  List
+  List,
+  Bot
 } from 'lucide-react'
 
 const SECTION_ICONS = {
@@ -20,14 +21,17 @@ const SECTION_ICONS = {
   dialogs: MessageSquare,
   files: FileText,
   tools: Wrench,
-  models: Cpu
+  models: Cpu,
+  bots: Bot
 }
 
 const ADMIN_SECTIONS = [
   { id: 'dashboards', label: 'Дашборды' },
   { id: 'users', label: 'Пользователи' },
   { id: 'dialogs', label: 'Диалоги' },
-  { id: 'files', label: 'Файлы' }
+  { id: 'files', label: 'Файлы' },
+  { id: 'tools', label: 'Инструменты' },
+  { id: 'bots', label: 'Боты' }
 ]
 
 export default function Sidebar({
