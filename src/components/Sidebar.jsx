@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Plus,
   MessageSquare,
@@ -28,6 +28,8 @@ const BOTS = [
 const TOOLS = [
   { id: 'tz-expert', name: 'ТЗ-эксперт', icon: FileCheck }
 ]
+
+const MAX_VISIBLE_CHATS = 15
 
 const SECTION_ICONS = {
   dashboards: LayoutDashboard,
@@ -70,6 +72,9 @@ export default function Sidebar({
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [botsExpanded, setBotsExpanded] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
+  const [chatsExpanded, setChatsExpanded] = useState(false)
+  // Nested view states - когда выбран конкретный бот или инструмент
+  const [nestedView, setNestedView] = useState(null) // { type: 'bot'|'tool', id: string, name: string, icon: Component }
 
   const handleBackToChat = () => {
     window.location.hash = '/'
@@ -102,22 +107,74 @@ export default function Sidebar({
   };
 
   const handleBotClick = (bot) => {
+    const activateBot = () => {
+      setNestedView({ type: 'bot', id: bot.id, name: bot.name, icon: bot.icon })
+      onBotSelect(bot)
+    }
+
     if (!isOpen) {
       onToggle(true)
-      setTimeout(() => onBotSelect(bot), 300)
+      setTimeout(activateBot, 300)
     } else {
-      onBotSelect(bot)
+      activateBot()
     }
   }
 
   const handleToolClick = (tool) => {
-    if (!isOpen) {
-      onToggle(true)
-      setTimeout(() => onToolSelect(tool), 300)
-    } else {
+    const activateTool = () => {
+      setNestedView({ type: 'tool', id: tool.id, name: tool.name, icon: tool.icon })
       onToolSelect(tool)
     }
+
+    if (!isOpen) {
+      onToggle(true)
+      setTimeout(activateTool, 300)
+    } else {
+      activateTool()
+    }
   }
+
+  const handleBackFromNestedView = () => {
+    setNestedView(null)
+    // Сброс активного бота/инструмента при возврате
+    if (nestedView?.type === 'bot') {
+      onBotSelect(null)
+    } else if (nestedView?.type === 'tool') {
+      onToolSelect(null)
+    }
+  }
+
+  const toggleChatsSection = () => {
+    if (!isOpen) {
+      onToggle(true)
+      setTimeout(() => setChatsExpanded(true), 300)
+    } else {
+      setChatsExpanded(!chatsExpanded)
+    }
+  }
+
+  // Фильтрация чатов для nested view (чаты конкретного бота)
+  const filteredChats = useMemo(() => {
+    if (!nestedView) return chats
+    if (nestedView.type === 'bot') {
+      return chats.filter(chat => chat.botId === nestedView.id)
+    }
+    if (nestedView.type === 'tool') {
+      return chats.filter(chat => chat.toolId === nestedView.id)
+    }
+    return chats
+  }, [chats, nestedView])
+
+  // Ограничение отображаемых чатов
+  const visibleChats = useMemo(() => {
+    const source = nestedView ? filteredChats : chats
+    return source.slice(0, MAX_VISIBLE_CHATS)
+  }, [filteredChats, chats, nestedView])
+
+  const hasMoreChats = useMemo(() => {
+    const source = nestedView ? filteredChats : chats
+    return source.length > MAX_VISIBLE_CHATS
+  }, [filteredChats, chats, nestedView])
 
   const toggleBotsSection = () => {
     if (!isOpen) {
@@ -137,8 +194,81 @@ export default function Sidebar({
     }
   }
 
-  const renderChatMode = () => (
-    <>
+  // Рендер nested view (когда выбран бот или инструмент)
+  const renderNestedView = () => {
+    const Icon = nestedView.icon
+    const typeLabel = nestedView.type === 'bot' ? 'бота' : 'инструмента'
+
+    return (
+      <div className="sidebar-nested-view">
+        {/* Кнопка Назад */}
+        <button
+          type="button"
+          className="sidebar-back-button"
+          onClick={handleBackFromNestedView}
+          title="Назад"
+        >
+          <span className="sidebar-back-icon">
+            <ArrowLeft size={18} />
+          </span>
+          <span className="sidebar-back-text">Назад</span>
+        </button>
+
+        {/* Выбранный бот/инструмент */}
+        <div className="sidebar-nested-header">
+          <span className="sidebar-nested-icon">
+            <Icon size={20} />
+          </span>
+          <span className="sidebar-nested-title">{nestedView.name}</span>
+        </div>
+
+        {/* Чаты этого бота/инструмента */}
+        <div className="sidebar-nested-chats-label">
+          Чаты {typeLabel}
+        </div>
+
+        <div className={`chat-list nested-chat-list ${!isOpen ? 'is-collapsed' : ''}`}>
+          {visibleChats.length > 0 ? (
+            visibleChats.map((chat) => (
+              <button
+                key={chat.id}
+                type="button"
+                onClick={() => onChatSelect(chat)}
+                className={`chat-item ${activeChat === chat.id ? 'is-active' : ''}`}
+              >
+                <span className="chat-item-icon">
+                  <MessageSquare size={18} />
+                </span>
+                <span className="chat-item-text truncate">{chat.title}</span>
+              </button>
+            ))
+          ) : (
+            <div className="sidebar-empty-state">
+              Нет чатов
+            </div>
+          )}
+
+          {hasMoreChats && (
+            <button
+              type="button"
+              className="chat-item view-all-chats-btn"
+              onClick={onViewAllChats}
+              title="Смотреть все чаты"
+            >
+              <span className="chat-item-icon">
+                <List size={18} />
+              </span>
+              <span className="chat-item-text">Смотреть все чаты</span>
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Рендер обычного вида сайдбара
+  const renderDefaultView = () => (
+    <div className="sidebar-default-view">
       {/* Раздел Боты */}
       <div className="sidebar-section">
         <button
@@ -217,6 +347,10 @@ export default function Sidebar({
         )}
       </div>
 
+      {/* Отступ между Инструменты и Новый чат */}
+      <div className="sidebar-spacer" />
+
+      {/* Кнопка Новый чат */}
       <div className="sidebar-action">
         <button
           type="button"
@@ -231,33 +365,60 @@ export default function Sidebar({
         </button>
       </div>
 
-      <div className={`chat-list ${!isOpen ? 'is-collapsed' : ''}`}>
-        {chats.map((chat) => (
-          <button
-            key={chat.id}
-            type="button"
-            onClick={() => onChatSelect(chat)}
-            className={`chat-item ${activeChat === chat.id ? 'is-active' : ''}`}
-          >
-            <span className="chat-item-icon">
-              <MessageSquare size={18} />
-            </span>
-            <span className="chat-item-text truncate">{chat.title}</span>
-          </button>
-        ))}
-
+      {/* Раздел Чаты */}
+      <div className="sidebar-section sidebar-chats-section">
         <button
           type="button"
-          className="chat-item view-all-chats-btn"
-          onClick={onViewAllChats}
-          title="Смотреть все чаты"
+          className="sidebar-section-header"
+          onClick={toggleChatsSection}
+          title="Чаты"
         >
-          <span className="chat-item-icon">
-            <List size={18} />
+          <span className="sidebar-section-icon">
+            <MessageSquare size={18} />
           </span>
-          <span className="chat-item-text">Смотреть все чаты</span>
+          <span className="sidebar-section-title">Чаты</span>
+          <span className="sidebar-section-chevron">
+            {chatsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </span>
         </button>
+        {chatsExpanded && isOpen && (
+          <div className={`chat-list ${!isOpen ? 'is-collapsed' : ''}`}>
+            {visibleChats.map((chat) => (
+              <button
+                key={chat.id}
+                type="button"
+                onClick={() => onChatSelect(chat)}
+                className={`chat-item ${activeChat === chat.id ? 'is-active' : ''}`}
+              >
+                <span className="chat-item-icon">
+                  <MessageSquare size={18} />
+                </span>
+                <span className="chat-item-text truncate">{chat.title}</span>
+              </button>
+            ))}
+
+            {hasMoreChats && (
+              <button
+                type="button"
+                className="chat-item view-all-chats-btn"
+                onClick={onViewAllChats}
+                title="Смотреть все чаты"
+              >
+                <span className="chat-item-icon">
+                  <List size={18} />
+                </span>
+                <span className="chat-item-text">Смотреть все чаты</span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
+    </div>
+  )
+
+  const renderChatMode = () => (
+    <div className={`sidebar-content-wrapper ${nestedView ? 'has-nested-view' : ''}`}>
+      {nestedView ? renderNestedView() : renderDefaultView()}
 
       <div className="user-section">
         <button
@@ -295,7 +456,7 @@ export default function Sidebar({
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 
   const renderAdminMode = () => {
