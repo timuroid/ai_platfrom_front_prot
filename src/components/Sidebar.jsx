@@ -249,11 +249,8 @@ export default function Sidebar({
                 key={chat.id}
                 type="button"
                 onClick={() => onChatSelect(chat)}
-                className={`chat-item ${activeChat === chat.id ? 'is-active' : ''}`}
+                className={`chat-item chat-item-no-icon ${activeChat === chat.id ? 'is-active' : ''}`}
               >
-                <span className="chat-item-icon">
-                  <MessageSquare size={18} />
-                </span>
                 <span className="chat-item-text truncate">{chat.title}</span>
               </button>
             ))
@@ -266,13 +263,10 @@ export default function Sidebar({
           {hasMoreChats && (
             <button
               type="button"
-              className="chat-item view-all-chats-btn"
+              className="chat-item chat-item-no-icon view-all-chats-btn"
               onClick={onViewAllChats}
               title="Смотреть все чаты"
             >
-              <span className="chat-item-icon">
-                <List size={18} />
-              </span>
               <span className="chat-item-text">Смотреть все чаты</span>
             </button>
           )}
@@ -362,8 +356,8 @@ export default function Sidebar({
         )}
       </div>
 
-      {/* Отступ между Инструменты и Новый чат */}
-      <div className="sidebar-spacer" />
+      {/* Разделитель между Инструменты и Новый чат */}
+      <div className="sidebar-divider" />
 
       {/* Кнопка Новый чат */}
       <div className="sidebar-action">
@@ -403,11 +397,8 @@ export default function Sidebar({
                 key={chat.id}
                 type="button"
                 onClick={() => onChatSelect(chat)}
-                className={`chat-item ${activeChat === chat.id ? 'is-active' : ''}`}
+                className={`chat-item chat-item-no-icon ${activeChat === chat.id ? 'is-active' : ''}`}
               >
-                <span className="chat-item-icon">
-                  <MessageSquare size={18} />
-                </span>
                 <span className="chat-item-text truncate">{chat.title}</span>
               </button>
             ))}
@@ -415,13 +406,10 @@ export default function Sidebar({
             {chats.length > 0 && (
               <button
                 type="button"
-                className="chat-item view-all-chats-btn"
+                className="chat-item chat-item-no-icon view-all-chats-btn"
                 onClick={onViewAllChats}
                 title="Смотреть все чаты"
               >
-                <span className="chat-item-icon">
-                  <List size={18} />
-                </span>
                 <span className="chat-item-text">Смотреть все чаты</span>
               </button>
             )}
