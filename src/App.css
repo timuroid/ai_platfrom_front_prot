@@ -169,11 +169,7 @@
   background: var(--hover-subtle);
 }
 
-.chat-item.is-active {
-  background: var(--surface-active);
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-}
+/* chat-item is-active styling removed - only hover effect remains */
 
 .chat-item-icon {
   position: absolute;
@@ -1961,11 +1957,7 @@
   background: var(--hover-subtle);
 }
 
-.sidebar-section-item.is-active {
-  background: var(--surface-active);
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-}
+/* sidebar-section-item is-active styling removed - only hover effect remains */
 
 .sidebar-section-item-icon {
   display: flex;
@@ -1979,6 +1971,75 @@
 .sidebar-section-item-text {
   flex: 1;
   text-align: left;
+}
+
+/* Wrapper for section items with plus button */
+.sidebar-section-item-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.sidebar-section-item-wrapper .sidebar-section-item {
+  flex: 1;
+}
+
+.sidebar-section-item-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-section-item-wrapper:hover .sidebar-section-item-plus {
+  opacity: 1;
+}
+
+.sidebar-section-item-plus:hover {
+  background: var(--hover-subtle);
+  color: var(--brand-primary);
+}
+
+/* Static header for Chats section (no hover) */
+.sidebar-section-header-static {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: default;
+}
+
+.sidebar-section-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-section-plus:hover {
+  background: var(--hover-subtle);
+  color: var(--brand-primary);
 }
 
 /* TZ Expert View */
@@ -2295,17 +2356,23 @@
   overflow: hidden;
 }
 
-/* Nested chats label */
-.sidebar-nested-chats-label {
+/* Nested chats header with plus button */
+.sidebar-nested-chats-header {
+  display: flex;
+  align-items: center;
   padding: var(--space-3) var(--space-4);
+}
+
+.sidebar-nested-chats-label {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  flex: 1;
 }
 
-.app-sidebar.is-collapsed .sidebar-nested-chats-label {
+.app-sidebar.is-collapsed .sidebar-nested-chats-header {
   opacity: 0;
   height: 0;
   padding: 0;
