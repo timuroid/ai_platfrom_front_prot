@@ -30,6 +30,7 @@ import DateRangePicker from './components/DateRangePicker.jsx'
 import UserDetails from './components/UserDetails.jsx'
 import DialogDetails from './components/DialogDetails.jsx'
 import ToolDetails from './components/ToolDetails.jsx'
+import BotDetails from './components/BotDetails.jsx'
 import './Admin.css'
 
 const DASHBOARD_MODES = {
@@ -133,8 +134,8 @@ const MANAGEMENT_SECTIONS = {
   },
   tools: {
     title: 'Инструменты',
-    columns: ['Название', 'Описание', 'Статус', 'Пользователей', 'Запусков (30д)', 'Успешность', 'Ср. время ответа', 'Создан'],
-    sortableColumns: ['name', 'description', 'status', 'usersCount', 'runs30d', 'successRate', 'avgResponseTime', 'createdAt'],
+    columns: ['Название', 'Статус', 'Пользователей', 'Запусков', 'Токенов', 'Стоимость ($)', 'Ср. время работы'],
+    sortableColumns: ['name', 'status', 'usersCount', 'runs', 'tokens', 'cost', 'avgWorkTime'],
     filters: [
       {
         id: 'status',
@@ -146,7 +147,7 @@ const MANAGEMENT_SECTIONS = {
           { value: 'inactive', label: 'Неактивен' }
         ]
       },
-      { id: 'search', label: 'Поиск', type: 'text', placeholder: 'Название инструмента' }
+      { id: 'period', label: 'Период', type: 'date-range', fromField: 'periodFrom', toField: 'periodTo' }
     ]
   },
   bots: {
@@ -231,10 +232,47 @@ const MOCK_TOOLS = [
     description: 'Генерация технических заданий на основе требований',
     status: 'active',
     usersCount: 45,
-    runs30d: 1250,
-    successRate: 94.5,
-    avgResponseTime: '2.3 сек',
+    runs: 1250,
+    tokens: 2450000,
+    cost: 245.80,
+    avgWorkTime: '2.3 сек',
     createdAt: '2025-08-15T10:00:00'
+  },
+  {
+    id: 2,
+    name: 'Code Reviewer',
+    description: 'Анализ и ревью кода с рекомендациями',
+    status: 'active',
+    usersCount: 32,
+    runs: 890,
+    tokens: 1850000,
+    cost: 185.40,
+    avgWorkTime: '4.1 сек',
+    createdAt: '2025-09-01T12:00:00'
+  },
+  {
+    id: 3,
+    name: 'Text Summarizer',
+    description: 'Краткое изложение документов и текстов',
+    status: 'active',
+    usersCount: 67,
+    runs: 2100,
+    tokens: 980000,
+    cost: 98.50,
+    avgWorkTime: '1.5 сек',
+    createdAt: '2025-07-20T09:00:00'
+  },
+  {
+    id: 4,
+    name: 'SQL Generator',
+    description: 'Генерация SQL запросов из текстового описания',
+    status: 'inactive',
+    usersCount: 18,
+    runs: 340,
+    tokens: 420000,
+    cost: 42.10,
+    avgWorkTime: '1.8 сек',
+    createdAt: '2025-10-05T14:30:00'
   }
 ]
 
@@ -591,6 +629,31 @@ export default function AdminDashboard() {
         }
       }
 
+      if (sectionId === 'tools') {
+        // Фильтр по статусу
+        if (sectionFilters.status && sectionFilters.status !== 'all') {
+          if (item.status !== sectionFilters.status) return false
+        }
+        // Фильтр по периоду (по дате создания)
+        if (sectionFilters.periodFrom) {
+          const itemDate = new Date(item.createdAt)
+          const fromDate = new Date(sectionFilters.periodFrom)
+          if (itemDate < fromDate) return false
+        }
+        if (sectionFilters.periodTo) {
+          const itemDate = new Date(item.createdAt)
+          const toDate = new Date(sectionFilters.periodTo)
+          if (itemDate > toDate) return false
+        }
+      }
+
+      if (sectionId === 'bots') {
+        // Фильтр по статусу
+        if (sectionFilters.status && sectionFilters.status !== 'all') {
+          if (item.status !== sectionFilters.status) return false
+        }
+      }
+
       return true
     })
   }
@@ -695,6 +758,10 @@ export default function AdminDashboard() {
 
   const navigateToToolDetails = (tool) => {
     setDetailView({ type: 'tool', item: tool })
+  }
+
+  const navigateToBotDetails = (bot) => {
+    setDetailView({ type: 'bot', item: bot })
   }
 
   const navigateBackToList = () => {
@@ -1907,17 +1974,16 @@ export default function AdminDashboard() {
                   {tool.name}
                 </button>
               </td>
-              <td><span className="text-small">{tool.description}</span></td>
               <td>
                 <span className={`status-badge status-${tool.status}`}>
                   {tool.status === 'active' ? 'Активен' : 'Неактивен'}
                 </span>
               </td>
               <td>{tool.usersCount}</td>
-              <td>{tool.runs30d.toLocaleString('ru-RU')}</td>
-              <td>{tool.successRate}%</td>
-              <td>{tool.avgResponseTime}</td>
-              <td>{new Date(tool.createdAt).toLocaleDateString('ru-RU')}</td>
+              <td>{tool.runs.toLocaleString('ru-RU')}</td>
+              <td>{tool.tokens.toLocaleString('ru-RU')}</td>
+              <td>${tool.cost.toFixed(2)}</td>
+              <td>{tool.avgWorkTime}</td>
             </tr>
           ))}
         </tbody>
@@ -1929,7 +1995,15 @@ export default function AdminDashboard() {
         <tbody>
           {data.map((bot) => (
             <tr key={bot.id}>
-              <td><strong>{bot.name}</strong></td>
+              <td>
+                <button
+                  type="button"
+                  className="clickable-cell"
+                  onClick={() => navigateToBotDetails(bot)}
+                >
+                  {bot.name}
+                </button>
+              </td>
               <td><span className="text-small">{bot.description}</span></td>
               <td>
                 <span className={`status-badge status-${bot.status}`}>
@@ -2286,6 +2360,9 @@ export default function AdminDashboard() {
         )}
         {detailView.type === 'tool' && detailView.item && (
           <ToolDetails tool={detailView.item} onBack={navigateBackToList} />
+        )}
+        {detailView.type === 'bot' && detailView.item && (
+          <BotDetails bot={detailView.item} onBack={navigateBackToList} />
         )}
 
         {/* Основной контент (если не открыта детальная страница) */}
