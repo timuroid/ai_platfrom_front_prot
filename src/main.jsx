@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import AdminDashboard from './admin/AdminDashboard.jsx'
+import TZExpertView from './components/TZExpertView.jsx'
 
 function Root() {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
@@ -21,6 +22,15 @@ function Root() {
 
   if (route === '/admin') {
     return <AdminDashboard />
+  }
+
+  if (route === '/tool/tz-expert') {
+    return <App initialView="tz-expert" />
+  }
+
+  if (route.startsWith('/bot/')) {
+    const botId = route.replace('/bot/', '')
+    return <App initialView="bot" initialBotId={botId} />
   }
 
   return <App />

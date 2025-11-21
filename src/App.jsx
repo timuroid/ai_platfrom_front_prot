@@ -25,6 +25,7 @@ import {
 import Sidebar from './components/Sidebar.jsx';
 import TeachingCards from './components/TeachingCards.jsx';
 import AllChatsView from './components/AllChatsView.jsx';
+import TZExpertView from './components/TZExpertView.jsx';
 import './App.css';
 
 const MODELS = [
@@ -214,7 +215,7 @@ const parseMarkdown = (text) => {
   return blocks.join('');
 };
 
-export default function LLMChatInterface() {
+export default function LLMChatInterface({ initialView = null, initialBotId = null }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [chats, setChats] = useState([{ id: 1, title: 'Новый чат', messages: [] }]);
   const [activeChat, setActiveChat] = useState(1);
@@ -238,6 +239,8 @@ export default function LLMChatInterface() {
   const [showTeachingCards, setShowTeachingCards] = useState(false);
   const [showAllChats, setShowAllChats] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
+  const [activeBot, setActiveBot] = useState(initialBotId);
+  const [activeTool, setActiveTool] = useState(initialView === 'tz-expert' ? 'tz-expert' : null);
   const streamingIntervalsRef = useRef(new Map());
   const toolsMenuRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -338,6 +341,32 @@ export default function LLMChatInterface() {
 
   const handleViewAllChats = () => {
     setShowAllChats(true);
+  };
+
+  const handleBotSelect = (bot) => {
+    setActiveBot(bot.id);
+    setActiveTool(null);
+    setShowAllChats(false);
+    // Создаем новый чат для бота
+    const botChatId = Date.now();
+    const botChatTitle = `${bot.name}`;
+    setChats((prev) => [{ id: botChatId, title: botChatTitle, messages: [], botId: bot.id }, ...prev]);
+    setActiveChat(botChatId);
+    setMessages([]);
+    window.location.hash = `/bot/${bot.id}`;
+  };
+
+  const handleToolSelect = (tool) => {
+    setActiveTool(tool.id);
+    setActiveBot(null);
+    setShowAllChats(false);
+    window.location.hash = `/tool/${tool.id}`;
+  };
+
+  const handleBackToChat = () => {
+    setActiveTool(null);
+    setActiveBot(null);
+    window.location.hash = '/';
   };
 
   const handleKeyPress = (event) => {
@@ -676,6 +705,10 @@ export default function LLMChatInterface() {
         onNewChat={createNewChat}
         onShowSettings={() => setShowSettings(true)}
         onViewAllChats={handleViewAllChats}
+        onBotSelect={handleBotSelect}
+        onToolSelect={handleToolSelect}
+        activeBot={activeBot}
+        activeTool={activeTool}
       />
 
       <style>{`
@@ -705,7 +738,9 @@ export default function LLMChatInterface() {
       </button>
 
       <main className="app-main">
-        {showAllChats ? (
+        {activeTool === 'tz-expert' ? (
+          <TZExpertView />
+        ) : showAllChats ? (
           <AllChatsView
             chats={chats}
             onChatSelect={handleChatSelect}

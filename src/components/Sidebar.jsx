@@ -11,8 +11,23 @@ import {
   FileText,
   Wrench,
   Cpu,
-  List
+  List,
+  ChevronDown,
+  ChevronRight,
+  Bot,
+  Search,
+  HelpCircle,
+  FileCheck
 } from 'lucide-react'
+
+const BOTS = [
+  { id: 'five-why', name: 'Пять почему', icon: HelpCircle },
+  { id: 'searcher', name: 'Поисковик', icon: Search }
+]
+
+const TOOLS = [
+  { id: 'tz-expert', name: 'ТЗ-эксперт', icon: FileCheck }
+]
 
 const SECTION_ICONS = {
   dashboards: LayoutDashboard,
@@ -41,11 +56,17 @@ export default function Sidebar({
   onNewChat = () => {},
   onShowSettings = () => {},
   onViewAllChats = () => {},
+  onBotSelect = () => {},
+  onToolSelect = () => {},
+  activeBot = null,
+  activeTool = null,
   // Props для режима admin
   activeSection = 'dashboards',
   onSectionSelect = () => {}
 }) {
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [botsExpanded, setBotsExpanded] = useState(false)
+  const [toolsExpanded, setToolsExpanded] = useState(false)
 
   const handleBackToChat = () => {
     window.location.hash = '/'
@@ -77,8 +98,122 @@ export default function Sidebar({
     }
   };
 
+  const handleBotClick = (bot) => {
+    if (!isOpen) {
+      onToggle(true)
+      setTimeout(() => onBotSelect(bot), 300)
+    } else {
+      onBotSelect(bot)
+    }
+  }
+
+  const handleToolClick = (tool) => {
+    if (!isOpen) {
+      onToggle(true)
+      setTimeout(() => onToolSelect(tool), 300)
+    } else {
+      onToolSelect(tool)
+    }
+  }
+
+  const toggleBotsSection = () => {
+    if (!isOpen) {
+      onToggle(true)
+      setTimeout(() => setBotsExpanded(true), 300)
+    } else {
+      setBotsExpanded(!botsExpanded)
+    }
+  }
+
+  const toggleToolsSection = () => {
+    if (!isOpen) {
+      onToggle(true)
+      setTimeout(() => setToolsExpanded(true), 300)
+    } else {
+      setToolsExpanded(!toolsExpanded)
+    }
+  }
+
   const renderChatMode = () => (
     <>
+      {/* Раздел Боты */}
+      <div className="sidebar-section">
+        <button
+          type="button"
+          className="sidebar-section-header"
+          onClick={toggleBotsSection}
+          title="Боты"
+        >
+          <span className="sidebar-section-icon">
+            <Bot size={18} />
+          </span>
+          <span className="sidebar-section-title">Боты</span>
+          <span className="sidebar-section-chevron">
+            {botsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </span>
+        </button>
+        {botsExpanded && isOpen && (
+          <div className="sidebar-section-content">
+            {BOTS.map((bot) => {
+              const Icon = bot.icon
+              return (
+                <button
+                  key={bot.id}
+                  type="button"
+                  className={`sidebar-section-item ${activeBot === bot.id ? 'is-active' : ''}`}
+                  onClick={() => handleBotClick(bot)}
+                  title={bot.name}
+                >
+                  <span className="sidebar-section-item-icon">
+                    <Icon size={16} />
+                  </span>
+                  <span className="sidebar-section-item-text">{bot.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Раздел Инструменты */}
+      <div className="sidebar-section">
+        <button
+          type="button"
+          className="sidebar-section-header"
+          onClick={toggleToolsSection}
+          title="Инструменты"
+        >
+          <span className="sidebar-section-icon">
+            <Wrench size={18} />
+          </span>
+          <span className="sidebar-section-title">Инструменты</span>
+          <span className="sidebar-section-chevron">
+            {toolsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </span>
+        </button>
+        {toolsExpanded && isOpen && (
+          <div className="sidebar-section-content">
+            {TOOLS.map((tool) => {
+              const Icon = tool.icon
+              return (
+                <button
+                  key={tool.id}
+                  type="button"
+                  className={`sidebar-section-item ${activeTool === tool.id ? 'is-active' : ''}`}
+                  onClick={() => handleToolClick(tool)}
+                  title={tool.name}
+                >
+                  <span className="sidebar-section-item-icon">
+                    <Icon size={16} />
+                  </span>
+                  <span className="sidebar-section-item-text">{tool.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
       <div className="sidebar-action">
         <button
           type="button"
