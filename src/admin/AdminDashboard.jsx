@@ -228,51 +228,18 @@ const MOCK_FILES = [
 const MOCK_TOOLS = [
   {
     id: 1,
-    name: 'TZ Expert',
+    name: 'TzExpert',
     description: 'Генерация технических заданий на основе требований',
     status: 'active',
     usersCount: 45,
     runs: 1250,
+    runs30d: 1250,
     tokens: 2450000,
     cost: 245.80,
     avgWorkTime: '2.3 сек',
+    avgResponseTime: '2.3 сек',
+    successRate: 94.5,
     createdAt: '2025-08-15T10:00:00'
-  },
-  {
-    id: 2,
-    name: 'Code Reviewer',
-    description: 'Анализ и ревью кода с рекомендациями',
-    status: 'active',
-    usersCount: 32,
-    runs: 890,
-    tokens: 1850000,
-    cost: 185.40,
-    avgWorkTime: '4.1 сек',
-    createdAt: '2025-09-01T12:00:00'
-  },
-  {
-    id: 3,
-    name: 'Text Summarizer',
-    description: 'Краткое изложение документов и текстов',
-    status: 'active',
-    usersCount: 67,
-    runs: 2100,
-    tokens: 980000,
-    cost: 98.50,
-    avgWorkTime: '1.5 сек',
-    createdAt: '2025-07-20T09:00:00'
-  },
-  {
-    id: 4,
-    name: 'SQL Generator',
-    description: 'Генерация SQL запросов из текстового описания',
-    status: 'inactive',
-    usersCount: 18,
-    runs: 340,
-    tokens: 420000,
-    cost: 42.10,
-    avgWorkTime: '1.8 сек',
-    createdAt: '2025-10-05T14:30:00'
   }
 ]
 
@@ -651,6 +618,11 @@ export default function AdminDashboard() {
         // Фильтр по статусу
         if (sectionFilters.status && sectionFilters.status !== 'all') {
           if (item.status !== sectionFilters.status) return false
+        }
+        // Фильтр по названию
+        if (sectionFilters.search && sectionFilters.search.trim()) {
+          const searchTerm = sectionFilters.search.toLowerCase()
+          if (!item.name.toLowerCase().includes(searchTerm)) return false
         }
       }
 
