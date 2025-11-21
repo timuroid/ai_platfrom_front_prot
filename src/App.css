@@ -99,9 +99,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
+  background: var(--brand-gradient);
+  border-radius: 50%;
+  color: var(--text-inverse);
 }
 
 .sidebar-button-text {
@@ -188,6 +191,10 @@
   text-align: left;
   margin-left: 30px;
   font-size: 0.8125rem;
+}
+
+.chat-item-no-icon .chat-item-text {
+  margin-left: 0;
 }
 
 .app-sidebar.is-collapsed .chat-item {
@@ -2340,9 +2347,11 @@
   font-style: italic;
 }
 
-/* Spacer between sections */
-.sidebar-spacer {
-  height: var(--space-2);
+/* Divider between sections */
+.sidebar-divider {
+  height: 1px;
+  margin: var(--space-3) var(--space-4);
+  background: var(--border-default);
   flex-shrink: 0;
 }
 
